@@ -152,6 +152,60 @@ public class Utilities{
 		return nf;
 	}
 	
+	public static boolean stateExist(TransitionSystem ts, String state)
+	{
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		{
+			Transition t=it.next();
+			if(t.getFrom().equals(state)||t.getTo().equals(state))
+				return true;
+		}
+		return false;
+	}
+	
+	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)
+	{
+		TransitionSystem nts=new TransitionSystem();
+		TransitionSystem tmpTs;
+		LinkedList<String> queue=new LinkedList<String>();
+		String init=Utilities.findInitialState(ts);
+		queue.add(init);
+		while(queue.isEmpty()!=true)
+		{
+			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());
+			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
+			{
+				Transition tmpT=it.next();
+				Transition nt=new Transition(tmpT.getFrom(),tmpT.getLabel(),tmpT.getTo());
+				if(Utilities.stateExist(nts, tmpT.getTo())!=true)
+				{					
+					nts.add(nt);
+					queue.addLast(nt.getTo());
+				}
+				else
+				{
+					nt.setTo(nt.getTo()+"loop");
+					nts.add(nt);
+				}
+			}
+		}
+		return ts;
+	}
+	
+	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)
+	{
+		TransitionSystem nextTransitions=new TransitionSystem();
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		{
+			Transition tmp=it.next();
+			if(tmp.getFrom().equals(from))
+			{
+				nextTransitions.add(tmp);
+			}
+		}
+		return nextTransitions;
+	}
+	
 	public static EventSet HashSetToEventSet(HashSet<String> hset)
 	{
 		EventSet eset=new EventSet();
