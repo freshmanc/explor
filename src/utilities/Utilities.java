@@ -175,15 +175,84 @@ public class Utilities{
 	public static TransitionSystem loopTransitionSystem(TransitionSystem ts, int loop)
 	{
 		TransitionSystem nts=new TransitionSystem();
+		nts.addAll(ts);
+		TransitionSystem tmpTs=null;
+		//for(int i=1;i<loop;i++)
+		//{
+			HashSet<String> setL=findStateWithSuccessors(ts);
+			for(Iterator<String> it=setL.iterator();it.hasNext();)
+			{
+				String tmp=it.next();
+				tmp=tmp.substring(0, tmp.length()-2);
+				tmpTs=Utilities.findSubTransitionSystems(ts, tmp);
+				for(int i=1;i<loop;i++)
+				{
+					
+				}
+			}
+		//}
 		return nts;
 	}
 	
-	public static TransitionSystem acyclicTransitionSystemWithInitState(TransitionSystem ts, String init)
+	public static TransitionSystem modifyTransitionsPrefix(TransitionSystem ts, String prefix, String substitute)
+	{
+		TransitionSystem nts=new TransitionSystem();
+		Transition tmp;
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		{
+			Transition t=it.next();
+			if(t.getFrom().equals(prefix))
+			{
+				tmp=new Transition(substitute, t.getLabel(),substitute+t.getTo());
+			}
+			else
+			{
+				tmp=new Transition(substitute+t.getFrom(), t.getLabel(),substitute+t.getTo());
+			}
+			nts.add(tmp);
+		}
+		return nts;
+	}
+	
+	
+	
+	public static TransitionSystem findSubTransitionSystems(TransitionSystem ts, String state)
 	{
 		TransitionSystem nts=new TransitionSystem();
 		TransitionSystem tmpTs;
 		LinkedList<String> queue=new LinkedList<String>();
-		queue.add(init);
+		queue.add(state);
+		while(queue.isEmpty()!=true)
+		{
+			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());
+			nts.addAll(tmpTs);
+			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
+				queue.add(it.next().getTo());
+		}
+		return nts;
+	}
+	
+	
+	public static HashSet<String> findStateWithSuccessors(TransitionSystem ts)
+	{
+		HashSet<String> set=new HashSet<String>();
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		{
+			Transition t=it.next();
+			if(t.getTo().indexOf(t.getTo().length()-1)=='^')
+			{
+				set.add(t.getTo());
+			}
+		}
+		return set;
+	}	
+	
+	public static TransitionSystem acyclicTransitionSystemFromState(TransitionSystem ts, String state)
+	{
+		TransitionSystem nts=new TransitionSystem();
+		TransitionSystem tmpTs;
+		LinkedList<String> queue=new LinkedList<String>();
+		queue.add(state);
 		while(queue.isEmpty()!=true)
 		{
 			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());
@@ -205,11 +274,12 @@ public class Utilities{
 		}
 		return nts;
 	}
+
 	
 	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)
 	{
 		String init=Utilities.findInitialState(ts);
-		return Utilities.acyclicTransitionSystemWithInitState(ts, init);
+		return Utilities.acyclicTransitionSystemFromState(ts, init);
 	}
 	
 	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)
