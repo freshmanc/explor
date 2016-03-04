@@ -3,6 +3,7 @@ import java.io.*;
 import java.util.Iterator;
 
 import structures.*;
+import structures.Process;
 
 public class FileLoader {
 
@@ -53,6 +54,17 @@ public class FileLoader {
 	            // ex.printStackTrace();
 	        }
 	    	return ts;
+	    }
+	    
+	    public static void main(String args[])
+	    {
+			TransitionSystem impT1=new TransitionSystem();
+			impT1=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-3_VendingMachine.lts");
+			//Utilities.printTransitionSystem(impT1);
+			impT1=Utilities.acyclicTransitionSystem(impT1);
+			Utilities.printTransitionSystem(impT1);
+			Process p=new Process(impT1);
+			//Utilities.printProcess(p);
 	    }
 	    
 }

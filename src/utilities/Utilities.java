@@ -163,12 +163,26 @@ public class Utilities{
 		return false;
 	}
 	
-	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)
+	public static void printTransitionSystem(TransitionSystem ts)
+	{
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		{
+			Transition t=it.next();
+			System.out.println("From:"+t.getFrom()+ " Label:"+t.getLabel()+ " To:"+t.getTo());
+		}
+	}
+	
+	public static TransitionSystem loopTransitionSystem(TransitionSystem ts, int loop)
+	{
+		TransitionSystem nts=new TransitionSystem();
+		return nts;
+	}
+	
+	public static TransitionSystem acyclicTransitionSystemWithInitState(TransitionSystem ts, String init)
 	{
 		TransitionSystem nts=new TransitionSystem();
 		TransitionSystem tmpTs;
 		LinkedList<String> queue=new LinkedList<String>();
-		String init=Utilities.findInitialState(ts);
 		queue.add(init);
 		while(queue.isEmpty()!=true)
 		{
@@ -184,12 +198,18 @@ public class Utilities{
 				}
 				else
 				{
-					nt.setTo(nt.getTo()+"loop");
+					nt.setTo(nt.getTo()+"^");
 					nts.add(nt);
 				}
 			}
 		}
-		return ts;
+		return nts;
+	}
+	
+	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)
+	{
+		String init=Utilities.findInitialState(ts);
+		return Utilities.acyclicTransitionSystemWithInitState(ts, init);
 	}
 	
 	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)
