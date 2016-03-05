@@ -156,36 +156,34 @@ public class Utilities{
 		return nf;
 	}
 	
-	public static boolean stateExistInLoop(TransitionSystem ts, String state) //check if there are any transitions from "state" back to "state"
+	private static boolean addTransitionWillCreateLoop(TransitionSystem ts, Transition t) //check if there are any transitions from "state" back to "state"
 	{
-		for(Iterator<Transition> it =ts.iterator();it.hasNext();)
+		//System.out.println("stateExistInLoop");
+		TransitionSystem nts=new TransitionSystem();
+		nts.addAll(ts);
+		nts.add(t);
+		String state=t.getFrom();
+		
+		LinkedList<String> queue=new LinkedList<String>();
+		queue.add(state);
+		TransitionSystem tmpTs;
+		while(queue.isEmpty()!=true)
 		{
-			if(it.next().getFrom().equals(state))
+			tmpTs=Utilities.nextTransitions(nts, queue.removeFirst());
+			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
 			{
-				return true;
+				Transition tmpT=it.next();
+				//System.out.println(tmpT.getFrom());
+				if(tmpT.getTo().equals(state))
+				{
+					return true;
+				}
+				else
+				{
+					queue.add(tmpT.getTo());
+				}
 			}
 		}
-//		System.out.println("State"+state);
-//		LinkedList<String> queue=new LinkedList<String>();
-//		queue.add(state);
-//		TransitionSystem tmpTs;
-//		while(queue.isEmpty()!=true)
-//		{
-//			tmpTs=Utilities.nextTransitions(ts, state);
-//			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
-//			{
-//				Transition t=it.next();
-//				System.out.println(t.getFrom());
-//				if(t.getTo().equals(state))
-//				{
-//					return true;
-//				}
-//				else
-//				{
-//					queue.add(t.getTo());
-//				}
-//			}
-//		}
 		return false;
 	}
 	
@@ -198,7 +196,7 @@ public class Utilities{
 		}
 	}
 	
-	public static TransitionSystem loopTransitionSystem(TransitionSystem ts, int loop)
+	public static TransitionSystem loopTransitionSystem(TransitionSystem ts, int loop)//loop the acyclic transition system
 	{
 		if(loop<=0)
 		{
@@ -238,7 +236,7 @@ public class Utilities{
 		}
 	}
 	
-	public static TransitionSystem modifyTransitionsPrefix(TransitionSystem ts, String prefix, String substitute)//add substitute before states 
+	private static TransitionSystem modifyTransitionsPrefix(TransitionSystem ts, String prefix, String substitute)//add substitute before states 
 	{
 		TransitionSystem nts=new TransitionSystem();
 		Transition tmp;
@@ -259,8 +257,8 @@ public class Utilities{
 	}
 	
 	
-	
-	public static TransitionSystem findSubTransitionSystems(TransitionSystem ts, String state)// find sub transition system after the state
+	//this is applied to acyclic transition system only
+	private static TransitionSystem findSubTransitionSystems(TransitionSystem ts, String state)// find sub transition system after the state
 	{
 		
 		TransitionSystem nts=new TransitionSystem();
@@ -277,8 +275,8 @@ public class Utilities{
 		return nts;
 	}
 	
-	
-	public static HashSet<String> findStateWithSuccessors(TransitionSystem ts) //find which sates was in a loop in previous transition system
+	//this is for finding state which had successors in cyclic transition system
+	private static HashSet<String> findStateWithSuccessors(TransitionSystem ts) //find which sates was in a loop in previous transition system
 	{
 		HashSet<String> set=new HashSet<String>();
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
@@ -295,20 +293,21 @@ public class Utilities{
 	
 	public static TransitionSystem acyclicTransitionSystemFromState(TransitionSystem ts, String state)// break loop after specific state
 	{
+		//System.out.println("acyclicTransitionSystemFromState");
 		TransitionSystem nts=new TransitionSystem();
 		TransitionSystem tmpTs;
 		LinkedList<String> queue=new LinkedList<String>();
 		queue.add(state);
 		while(queue.isEmpty()!=true)
 		{
-			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());
+			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());			
 			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
 			{
 				Transition tmpT=it.next();
 				//System.out.println(tmpT.getFrom()+tmpT.getLabel()+tmpT.getTo());
 				Transition nt=new Transition(tmpT.getFrom(),tmpT.getLabel(),tmpT.getTo());
-				if(Utilities.stateExistInLoop(nts, tmpT.getTo())!=true)
-				{					
+				if(Utilities.addTransitionWillCreateLoop(nts, nt)!=true)
+				{						
 					nts.add(nt);
 					queue.addLast(nt.getTo());
 				}
@@ -326,26 +325,27 @@ public class Utilities{
 	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)// break the loop of the transition system
 	{
 		String init=Utilities.findInitialState(ts);
-		//System.out.println(init);
+		//System.out.println("acyclicTransitionSystem"+ " initial:"+ init);
 		return Utilities.acyclicTransitionSystemFromState(ts, init);
 	}
 	
 	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)// find all immediate transitions started from "from"
 	{
+		//System.out.println("nextTransitions");
 		TransitionSystem nextTransitions=new TransitionSystem();
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
 		{
 			Transition tmp=it.next();
 			if(tmp.getFrom().equals(from))
 			{
-				//System.out.println("next"+tmp.getFrom()+tmp.getLabel()+tmp.getTo());
+				//System.out.println(tmp.getFrom()+tmp.getLabel()+tmp.getTo());
 				nextTransitions.add(tmp);
 			}
 		}
 		return nextTransitions;
 	}
 	
-	public static EventSet HashSetToEventSet(HashSet<String> hset)
+	public static EventSet HashSetToEventSet(HashSet<String> hset)//change hashset to eventset
 	{
 		EventSet eset=new EventSet();
 		for(Iterator it=hset.iterator();it.hasNext();)
