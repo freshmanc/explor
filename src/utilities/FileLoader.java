@@ -64,9 +64,10 @@ public class FileLoader {
 			impT1=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-1_VendingMachine.lts");
 			//Utilities.printTransitionSystem(impT1);
 			impT1=Utilities.acyclicTransitionSystem(impT1);
-			//impT1=Utilities.loopTransitionSystem(impT1, 3);
+			impT1=Utilities.loopTransitionSystem(impT1, 2);
 			//Utilities.printTransitionSystem(impT1);
 			Process p=new Process(impT1);
+			//Utilities.printProcess(p);
 			FailureTree ftp=new FailureTree(p);
 			EventSet newAlphabet=new EventSet();
 			newAlphabet.add("coke");
@@ -74,7 +75,7 @@ public class FileLoader {
 			newAlphabet.add("pepsi");
 
 			ftp=new EquivalentFailureTree(ftp, newAlphabet);
-			Utilities.printProcess(ftp.treeToProcess());
+			//Utilities.printProcess(ftp.treeToProcess());
 			
 			TransitionSystem impT2=new TransitionSystem();
 			impT2=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-1_customer.lts");
@@ -83,10 +84,10 @@ public class FileLoader {
 			//Utilities.printTransitionSystem(impT2);
 			Process q=new Process(impT2);
 			//q=new LoopProcesses(q,2);
-			Utilities.printProcess(q);
+			//Utilities.printProcess(q);
 			
-			//Process pq=new Communication(p,q);
-			//Utilities.printProcess(pq);
+			Process pq=new Communication(p,q);
+			Utilities.printProcess(pq);
 	    }
 	    
 }
