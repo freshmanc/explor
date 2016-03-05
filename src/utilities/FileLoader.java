@@ -2,6 +2,8 @@ package utilities;
 import java.io.*;
 import java.util.Iterator;
 
+import operation.Communication;
+import operation.LoopProcesses;
 import structures.*;
 import structures.Process;
 
@@ -62,18 +64,22 @@ public class FileLoader {
 			impT1=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-3_VendingMachine.lts");
 			//Utilities.printTransitionSystem(impT1);
 			impT1=Utilities.acyclicTransitionSystem(impT1);
-			impT1=Utilities.loopTransitionSystem(impT1, 3);
-			Utilities.printTransitionSystem(impT1);
-			//Process p=new Process(impT1);
+			//impT1=Utilities.loopTransitionSystem(impT1, 3);
+			//Utilities.printTransitionSystem(impT1);
+			Process p=new Process(impT1);
 			//Utilities.printProcess(p);
 			
-//			TransitionSystem impT2=new TransitionSystem();
-//			impT2=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-3_customer.lts");
-//			//Utilities.printTransitionSystem(impT1);
-//			impT2=Utilities.acyclicTransitionSystem(impT2);
-//			Utilities.printTransitionSystem(impT2);
-//			Process q=new Process(impT2);
-//			//Utilities.printProcess(p);
+			TransitionSystem impT2=new TransitionSystem();
+			impT2=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-3_customer.lts");
+			//Utilities.printTransitionSystem(impT1);
+			impT2=Utilities.acyclicTransitionSystem(impT2);
+			//Utilities.printTransitionSystem(impT2);
+			Process q=new Process(impT2);
+			q=new LoopProcesses(q,2);
+			//Utilities.printProcess(q);
+			
+			Process pq=new Communication(p,q);
+			Utilities.printProcess(pq);
 	    }
 	    
 }

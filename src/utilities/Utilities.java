@@ -355,18 +355,19 @@ public class Utilities{
 		return eset;
 	}
 	
-	public static void ExtendEventsToProcess(Process p,EventSet e)
+	public static void ExtendEventsToProcess(Process p,EventSet e) //when two process deterministic select, nondeterministic, execute sequentially, loop, the alphabet and refusals need to be extended
 	{
-		p.setAlphabet((EventSet) Utilities.union(p.getAlphabet(), e));
-		for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();) 
+		p.setAlphabet((EventSet) Utilities.union(p.getAlphabet(), e)); //extend alphabet first
+		for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();)  //extend each failure
 		{
 			Failure tmpf=pit.next();
-			EventSet tmpp=Utilities.HashSetToEventSet(Utilities.powerSetToSet(tmpf.getRefusal()));
-			EventSet diff=Utilities.HashSetToEventSet(Utilities.setDiff(tmpp, p.getAlphabet()));
-			EventSet intec=Utilities.HashSetToEventSet(Utilities.intersection(diff, e));
-			EventSet tmpq=Utilities.HashSetToEventSet(Utilities.setDiff(e, intec));
+			EventSet tmpp=Utilities.HashSetToEventSet(Utilities.powerSetToSet(tmpf.getRefusal())); //get events in refusal
+			EventSet diff=Utilities.HashSetToEventSet(Utilities.setDiff(tmpp, p.getAlphabet())); //find other events not in refusal but in alphabet
+			EventSet intec=Utilities.HashSetToEventSet(Utilities.intersection(diff, e)); //find out events not in refusal but in the alphabet and the set e
+			EventSet tmpq=Utilities.HashSetToEventSet(Utilities.setDiff(e, intec)); 
 			EventSet tmppq=Utilities.HashSetToEventSet(Utilities.union(tmpp,tmpq));
 			HashSet<HashSet<String>> tmpr=Utilities.powerSet(tmppq);
+			tmpr.remove(new HashSet<String>());// remove empty set
 			Refusal rf=new Refusal();
 			for(Iterator nit=tmpr.iterator();nit.hasNext();)
 			{

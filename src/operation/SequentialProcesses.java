@@ -7,7 +7,7 @@ import structures.Process;
 import utilities.Utilities;
 import structures.*;
 
-public class SequentialProcesses extends Process{
+public class SequentialProcesses extends Process{ //build sequential processes
 
 	public SequentialProcesses(Process p,Process q)
 	{

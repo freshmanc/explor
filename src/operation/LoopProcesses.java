@@ -12,13 +12,25 @@ public class LoopProcesses extends Process{
 	
 	public LoopProcesses(Process p, int time)
 	{
-		Process s=p;
-		for(int i=1;i<time;i++)
+		if(time<=0)
 		{
-			s=new SequentialProcesses(s,p);
+			System.out.println("the number of loops must be bigger than 0");
 		}
-		this.alphabet=s.getAlphabet();
-		this.failures=s.getFailures();
+		else if(time==1) //loop once
+		{
+			this.alphabet.addAll(p.getAlphabet());
+			this.failures.addAll(p.getFailures());
+		}
+		else //loop more than once
+		{
+			Process s=p;
+			for(int i=1;i<time;i++)
+			{
+				s=new SequentialProcesses(s,p);// using SequentialProcess for loop
+			}
+			this.alphabet.addAll(s.getAlphabet());
+			this.failures.addAll(s.getFailures());
+		}
 	}
 	
 	public static void main(String args[])

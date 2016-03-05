@@ -21,7 +21,7 @@ public class Communication extends Process{
 	{
 		this.P=p;
 		this.Q=q;
-		this.alphabet=(EventSet) Utilities.union(P.getAlphabet(), Q.getAlphabet());
+		this.alphabet=Utilities.HashSetToEventSet( Utilities.intersection((HashSet<String>)P.getAlphabet(), (HashSet<String>)Q.getAlphabet()));
 		execute();
 	}
 	
