@@ -174,27 +174,46 @@ public class Utilities{
 	
 	public static TransitionSystem loopTransitionSystem(TransitionSystem ts, int loop)
 	{
-		TransitionSystem nts=new TransitionSystem();
-		nts.addAll(ts);
-		TransitionSystem tmpTs=null;
-		//for(int i=1;i<loop;i++)
-		//{
-			HashSet<String> setL=findStateWithSuccessors(ts);
-			for(Iterator<String> it=setL.iterator();it.hasNext();)
+		if(loop<=0)
+		{
+			return null;
+		}
+		if(loop==1)
+		{
+			TransitionSystem nts=new TransitionSystem();
+			nts.addAll(ts);
+			return nts;
+		}
+		else
+		{
+			TransitionSystem nts=new TransitionSystem();
+			nts.addAll(ts);
+			for(int i=1;i<loop;i++)
 			{
-				String tmp=it.next();
-				tmp=tmp.substring(0, tmp.length()-2);
-				tmpTs=Utilities.findSubTransitionSystems(ts, tmp);
-				for(int i=1;i<loop;i++)
+				TransitionSystem tmpTs=null;
+				HashSet<String> setL=findStateWithSuccessors(nts);// find states end with ^
+				for(Iterator<String> it=setL.iterator();it.hasNext();)
 				{
-					
+					String tmp=it.next();
+					String substitute=new String(tmp);
+					tmp=tmp.substring(0, tmp.length()-2);//remove the last ^
+					int lastIndex=tmp.lastIndexOf('^');// get the position of second last ^
+					String prefix;
+					if(lastIndex>=0)
+						prefix =tmp.substring(lastIndex+1); //get the string between second last ^ and last ^
+					else
+						prefix=tmp;// if there is no second last ^, just take the string tmp;
+					tmpTs=Utilities.findSubTransitionSystems(ts, prefix);
+					tmpTs=Utilities.modifyTransitionsPrefix(tmpTs, prefix, substitute);
+					nts.addAll(tmpTs);
 				}
+				return nts;
 			}
-		//}
-		return nts;
+		}
+		return null;
 	}
 	
-	public static TransitionSystem modifyTransitionsPrefix(TransitionSystem ts, String prefix, String substitute)
+	public static TransitionSystem modifyTransitionsPrefix(TransitionSystem ts, String prefix, String substitute)//add substitute before states 
 	{
 		TransitionSystem nts=new TransitionSystem();
 		Transition tmp;
@@ -216,7 +235,7 @@ public class Utilities{
 	
 	
 	
-	public static TransitionSystem findSubTransitionSystems(TransitionSystem ts, String state)
+	public static TransitionSystem findSubTransitionSystems(TransitionSystem ts, String state)// find sub transition system after the state
 	{
 		TransitionSystem nts=new TransitionSystem();
 		TransitionSystem tmpTs;
@@ -233,13 +252,13 @@ public class Utilities{
 	}
 	
 	
-	public static HashSet<String> findStateWithSuccessors(TransitionSystem ts)
+	public static HashSet<String> findStateWithSuccessors(TransitionSystem ts) //find which sates was in a loop in previous transition system
 	{
 		HashSet<String> set=new HashSet<String>();
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
 		{
 			Transition t=it.next();
-			if(t.getTo().indexOf(t.getTo().length()-1)=='^')
+			if(t.getTo().indexOf(t.getTo().length()-1)=='^')//the state always ending with ^ was in a loop
 			{
 				set.add(t.getTo());
 			}
@@ -247,7 +266,7 @@ public class Utilities{
 		return set;
 	}	
 	
-	public static TransitionSystem acyclicTransitionSystemFromState(TransitionSystem ts, String state)
+	public static TransitionSystem acyclicTransitionSystemFromState(TransitionSystem ts, String state)// break loop after specific state
 	{
 		TransitionSystem nts=new TransitionSystem();
 		TransitionSystem tmpTs;
@@ -276,13 +295,13 @@ public class Utilities{
 	}
 
 	
-	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)
+	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)// break the loop of the transition system
 	{
 		String init=Utilities.findInitialState(ts);
 		return Utilities.acyclicTransitionSystemFromState(ts, init);
 	}
 	
-	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)
+	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)// find all immediate transitions started from "from"
 	{
 		TransitionSystem nextTransitions=new TransitionSystem();
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
