@@ -50,8 +50,12 @@ public class Utilities{
     	for(Iterator<Transition> it=ts.iterator();it.hasNext();)
     	{
     		Transition t=it.next();
-    		if(init>Double.valueOf(t.getFrom()))
-    			init=Double.valueOf(t.getFrom());
+    		String from=t.getFrom();
+    		if(from.contains("^")!=true)
+    		{
+    			if(init>Double.valueOf(from))
+    				init=Double.valueOf(from);
+    		}
     	}
     	return numberFmt(init);
 	}
@@ -152,14 +156,36 @@ public class Utilities{
 		return nf;
 	}
 	
-	public static boolean stateExist(TransitionSystem ts, String state)
+	public static boolean stateExistInLoop(TransitionSystem ts, String state) //check if there are any transitions from "state" back to "state"
 	{
-		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		for(Iterator<Transition> it =ts.iterator();it.hasNext();)
 		{
-			Transition t=it.next();
-			if(t.getFrom().equals(state)||t.getTo().equals(state))
+			if(it.next().getFrom().equals(state))
+			{
 				return true;
+			}
 		}
+//		System.out.println("State"+state);
+//		LinkedList<String> queue=new LinkedList<String>();
+//		queue.add(state);
+//		TransitionSystem tmpTs;
+//		while(queue.isEmpty()!=true)
+//		{
+//			tmpTs=Utilities.nextTransitions(ts, state);
+//			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
+//			{
+//				Transition t=it.next();
+//				System.out.println(t.getFrom());
+//				if(t.getTo().equals(state))
+//				{
+//					return true;
+//				}
+//				else
+//				{
+//					queue.add(t.getTo());
+//				}
+//			}
+//		}
 		return false;
 	}
 	
@@ -196,7 +222,7 @@ public class Utilities{
 				{
 					String tmp=it.next();
 					String substitute=new String(tmp);
-					tmp=tmp.substring(0, tmp.length()-2);//remove the last ^
+					tmp=tmp.substring(0, tmp.length()-1);//remove the last ^
 					int lastIndex=tmp.lastIndexOf('^');// get the position of second last ^
 					String prefix;
 					if(lastIndex>=0)
@@ -206,11 +232,10 @@ public class Utilities{
 					tmpTs=Utilities.findSubTransitionSystems(ts, prefix);
 					tmpTs=Utilities.modifyTransitionsPrefix(tmpTs, prefix, substitute);
 					nts.addAll(tmpTs);
-				}
-				return nts;
+				}		
 			}
+			return nts;
 		}
-		return null;
 	}
 	
 	public static TransitionSystem modifyTransitionsPrefix(TransitionSystem ts, String prefix, String substitute)//add substitute before states 
@@ -237,6 +262,7 @@ public class Utilities{
 	
 	public static TransitionSystem findSubTransitionSystems(TransitionSystem ts, String state)// find sub transition system after the state
 	{
+		
 		TransitionSystem nts=new TransitionSystem();
 		TransitionSystem tmpTs;
 		LinkedList<String> queue=new LinkedList<String>();
@@ -258,9 +284,10 @@ public class Utilities{
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
 		{
 			Transition t=it.next();
-			if(t.getTo().indexOf(t.getTo().length()-1)=='^')//the state always ending with ^ was in a loop
+			String to=t.getTo();
+			if(to.lastIndexOf("^")==to.length()-1)//the state always ending with ^ was in a loop
 			{
-				set.add(t.getTo());
+				set.add(to);
 			}
 		}
 		return set;
@@ -278,8 +305,9 @@ public class Utilities{
 			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
 			{
 				Transition tmpT=it.next();
+				//System.out.println(tmpT.getFrom()+tmpT.getLabel()+tmpT.getTo());
 				Transition nt=new Transition(tmpT.getFrom(),tmpT.getLabel(),tmpT.getTo());
-				if(Utilities.stateExist(nts, tmpT.getTo())!=true)
+				if(Utilities.stateExistInLoop(nts, tmpT.getTo())!=true)
 				{					
 					nts.add(nt);
 					queue.addLast(nt.getTo());
@@ -298,6 +326,7 @@ public class Utilities{
 	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)// break the loop of the transition system
 	{
 		String init=Utilities.findInitialState(ts);
+		//System.out.println(init);
 		return Utilities.acyclicTransitionSystemFromState(ts, init);
 	}
 	
@@ -309,6 +338,7 @@ public class Utilities{
 			Transition tmp=it.next();
 			if(tmp.getFrom().equals(from))
 			{
+				//System.out.println("next"+tmp.getFrom()+tmp.getLabel()+tmp.getTo());
 				nextTransitions.add(tmp);
 			}
 		}
