@@ -123,7 +123,7 @@ public class Utilities{
 	}
 
 	
-	public static Trace filterTrace(Trace t, EventSet evts)
+	public static Trace filterTrace(Trace t, EventSet evts) //remove events from trace
 	{
 		Trace nt=new Trace();
 		for(Iterator<String> it=t.iterator();it.hasNext();)
@@ -137,7 +137,7 @@ public class Utilities{
 		return nt;
 	}
 	
-	public static Refusal filterRefursal(HashSet<HashSet<String>> f, EventSet evts)
+	public static Refusal filterRefursal(HashSet<HashSet<String>> f, EventSet evts) //remove events from refusal
 	{
 		Refusal nf=new Refusal();
 		for(Iterator<HashSet<String>> it=f.iterator();it.hasNext();)
@@ -148,7 +148,7 @@ public class Utilities{
 		return nf;
 	}
 	
-	public static Failure filterFailure(Failure f,EventSet evts)
+	public static Failure filterFailure(Failure f,EventSet evts) //remove events from failure
 	{
 		Failure nf=new Failure();
 		nf.setTrace(Utilities.filterTrace(f.getTrace(), evts));
@@ -546,12 +546,12 @@ public class Utilities{
 		return list;
 	}
 	
-	public static Pair findEquivalentFailureTreeNode(FailureTreeNode node,EventSet evts)
+	public static Pair findEquivalentFailureTreeNode(FailureTreeNode node,EventSet evts) 
 	//EventSet is the set that contains acceptable events
 	{
 		Pair pair= new Pair(new HashSet<FailureTreeNode>(),new HashSet<FailureTreeNode>());
-		HashSet<FailureTreeNode> equ=new HashSet<FailureTreeNode>();
-		HashSet<FailureTreeNode> cat=new HashSet<FailureTreeNode>();
+		HashSet<FailureTreeNode> equ=new HashSet<FailureTreeNode>();// to calculate the failure
+		HashSet<FailureTreeNode> cat=new HashSet<FailureTreeNode>();// to calculate the mapping between nodes
 		if(node.getChildren().size()==0)
 		{
 			cat.add(node);

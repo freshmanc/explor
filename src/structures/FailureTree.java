@@ -54,6 +54,7 @@ public class FailureTree {
 		{
 			Failure f=new Failure();
 			FailureTreeNode tmp=it.next();
+
 			f.setRefusal(tmp.getData().getRefusal());
 			f.setTrace(tmp.getData().getTrace());
 			p.getFailures().add(f);

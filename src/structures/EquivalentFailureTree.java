@@ -45,7 +45,7 @@ public class EquivalentFailureTree extends FailureTree{
 		return list;
 	}
 	
-	public FailureTreeNode buildNode(FailureTreeNode ftn,EventSet evts)
+	public FailureTreeNode buildNode(FailureTreeNode ftn,EventSet evts) //find equivalent nodes and nodes mapped to it
 	{
 		FailureTreeNode node=new FailureTreeNode();
 		node.setParent(null);
@@ -55,6 +55,7 @@ public class EquivalentFailureTree extends FailureTree{
 		{
 			node.getData().getRefusal().add(it.next());
 		}
+		
 		Pair pair=Utilities.findEquivalentFailureTreeNode(ftn, evts);
 
 

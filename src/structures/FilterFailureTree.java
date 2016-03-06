@@ -3,17 +3,16 @@ import java.util.*;
 
 import utilities.Utilities;
 
-public class FilterFailureTree extends FailureTree{
+public class FilterFailureTree extends FailureTree{ // simply remove events from trace and refusal
 
 	//private EventSet alphabet;
 	//private FailureTreeNode root;
 
-	public FilterFailureTree(FailureTree ft, EventSet evts) {
+	public FilterFailureTree(FailureTree ft, EventSet evts) { 
 		
 		this.setAlphabet(new EventSet(evts));
 		filterInit(ft.getRoot(),evts);
 		filterSubTree(this.getRoot(),ft.getRoot(),evts);
-		// TODO Auto-generated constructor stub
 	}
 	private void filterInit(FailureTreeNode node,EventSet evts)
 	{
