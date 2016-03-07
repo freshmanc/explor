@@ -5,7 +5,7 @@ import structures.Object;
 import structures.Process;
 import utilities.Utilities;
 
-public class FailureTree {
+public class FailureTree { //make the process as a tree, each node contains a trace and a refusal
 	private EventSet alphabet;
 	private FailureTreeNode root;
 	
@@ -32,7 +32,7 @@ public class FailureTree {
 	{
 		this.alphabet=p.getAlphabet();
 		buildInit(p);
-		buildSubTree(new Trace(),root,p);
+		buildSubTree(root.getData(),root,p);
 	}
 	
 	private void buildInit(Process p)
@@ -62,18 +62,22 @@ public class FailureTree {
 		}
 	}
 	
-	private void buildSubTree(Trace trace, FailureTreeNode node, Process p)
+	private void buildSubTree(Failure failure, FailureTreeNode node, Process p) 
 	{
-		for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
+		HashSet<String> refusalEvents=Utilities.powerSetToSet(failure.getRefusal());
+		if(Utilities.compareEventSets(Utilities.HashSetToEventSet(refusalEvents),p.getAlphabet())==false)//if the node has successors, the refusal will be not equal to the alphabet
 		{
-			Failure tmpf=(Failure)it.next();
-			
-			if(Utilities.subTrace(trace,tmpf.getTrace()) && (trace.size()+1)==tmpf.getTrace().size())
+			for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
 			{
-				FailureTreeNode child=new FailureTreeNode(tmpf);
-				child.setParent(node);
-				node.addChild(child);
-				buildSubTree(tmpf.getTrace(),child, p);
+				Failure tmpf=(Failure)it.next();
+				
+				if(Utilities.subTrace(failure.getTrace(),tmpf.getTrace()) && (failure.getTrace().size()+1)==tmpf.getTrace().size())
+				{
+					FailureTreeNode child=new FailureTreeNode(tmpf);
+					child.setParent(node);
+					node.addChild(child);
+					buildSubTree(tmpf,child, p);
+				}
 			}
 		}
 	}

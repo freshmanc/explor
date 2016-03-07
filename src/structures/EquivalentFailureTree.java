@@ -26,7 +26,9 @@ public class EquivalentFailureTree extends FailureTree{
 		{
 			for(Iterator<FailureTreeNode> it=list.iterator();it.hasNext();)
 			{
+				
 				FailureTreeNode ftntmp=it.next();
+				//System.out.println(ftntmp.getData().getTrace()+" with "+ftntmp.getData().getRefusal());
 				FailureTreeNode child=buildNode(ftntmp,evts);
 				child.setParent(node);
 				node.addChild(child);
@@ -35,12 +37,14 @@ public class EquivalentFailureTree extends FailureTree{
 		}
 	}
 	
-	public List<FailureTreeNode> findChildren(HashSet<FailureTreeNode> set, EventSet evts)
+	public List<FailureTreeNode> findChildren(HashSet<FailureTreeNode> set, EventSet evts) 
 	{
 		List<FailureTreeNode> list=new ArrayList<FailureTreeNode>();
 		for(Iterator<FailureTreeNode> it=set.iterator();it.hasNext();)
 		{
-			list.addAll(Utilities.findEquivalentChildren(it.next(), evts));
+			FailureTreeNode ftn=it.next();
+			//System.out.println(ftn.getData().getTrace()+" and "+ftn.getData().getRefusal());
+			list.addAll(Utilities.findEquivalentChildren(ftn, evts));
 		}
 		return list;
 	}
@@ -49,23 +53,26 @@ public class EquivalentFailureTree extends FailureTree{
 	{
 		FailureTreeNode node=new FailureTreeNode();
 		node.setParent(null);
-		HashSet<HashSet<String>> pwtevts=Utilities.powerSet(evts);
+		
+		HashSet<HashSet<String>> pwtevts=Utilities.powerSet(evts); 
 		pwtevts.remove(new EventSet());
-		for(Iterator<HashSet<String>> it=pwtevts.iterator();it.hasNext();)
+		for(Iterator<HashSet<String>> it=pwtevts.iterator();it.hasNext();) //refusal is initialized as powerset of evts
 		{
 			node.getData().getRefusal().add(it.next());
 		}
 		
-		Pair pair=Utilities.findEquivalentFailureTreeNode(ftn, evts);
+		Pair pair=Utilities.findEquivalentFailureTreeNode(ftn, evts); 
+		
 
 
 		HashSet<FailureTreeNode> set=pair.getEqu();
 		for(Iterator<FailureTreeNode> it=set.iterator();it.hasNext();)
 		{
 			FailureTreeNode ftntmp=it.next();
+			//System.out.println(ftn.getData().getTrace()+":"+ftntmp.getData().getTrace()+":"+ftntmp.getData().getRefusal());
 			Refusal r=ftntmp.getData().getRefusal();
 			r=Utilities.filterRefursal(r, evts);
-			HashSet<HashSet<String>> pwttmp=Utilities.intersection(node.getData().getRefusal(), r);
+			HashSet<HashSet<String>> pwttmp=Utilities.intersection(node.getData().getRefusal(), r);// refusal = intersection of all refusals
 			node.getData().getRefusal().clear();
 			for(Iterator<HashSet<String>> itp=pwttmp.iterator();itp.hasNext();)
 			{

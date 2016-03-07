@@ -531,7 +531,7 @@ public class Utilities{
 		return null;
 	}
 	
-	public static List<FailureTreeNode> findEquivalentChildren(FailureTreeNode ftn, EventSet evts)
+	public static List<FailureTreeNode> findEquivalentChildren(FailureTreeNode ftn, EventSet evts) //find children whose last event in the trace is  in the evts
 	{
 		List<FailureTreeNode> list=new ArrayList<FailureTreeNode>();
 		for(Iterator<FailureTreeNode> cit=ftn.getChildren().iterator();cit.hasNext();)
@@ -546,7 +546,7 @@ public class Utilities{
 		return list;
 	}
 	
-	public static Pair findEquivalentFailureTreeNode(FailureTreeNode node,EventSet evts) 
+	public static Pair findEquivalentFailureTreeNode(FailureTreeNode node,EventSet evts) //find nodes which have same trace as the "node"
 	//EventSet is the set that contains acceptable events
 	{
 		Pair pair= new Pair(new HashSet<FailureTreeNode>(),new HashSet<FailureTreeNode>());
@@ -618,6 +618,34 @@ public class Utilities{
 			Failure f=it.next();
 			Refusal newEvents=new Refusal();
 		}
+	}
+	
+	public static boolean compareEventSets(EventSet evts1, EventSet evts2)
+	{
+		boolean flag= false;
+		if(evts1.size()==evts2.size())
+		{
+			for(Iterator<String> it1=evts1.iterator();it1.hasNext();)
+			{
+				flag=false;
+				String tmp1=it1.next();
+				for(Iterator<String> it2=evts2.iterator();it2.hasNext();)
+				{
+					String tmp2=it2.next();
+					if(tmp2.equals(tmp1))
+					{
+						flag=true;
+						break;
+					}
+				}
+				if(flag==false)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public static void CategoryProcessToXML(Element elm, Document doc, CategoryProcess cp)
