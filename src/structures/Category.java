@@ -1,10 +1,11 @@
+//developer ming zhu
 package structures;
 
 import vm.Drink;
 
-public class Category {
+public class Category { // the category is represented as a tree structure
 
-		protected Object<Process> init;
+		protected Object<Process> init;  //the root of the tree
 		
 		public Object<Process> getInit() {
 			return init;

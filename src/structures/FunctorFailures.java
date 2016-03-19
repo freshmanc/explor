@@ -1,5 +1,5 @@
+//developer ming zhu
 package structures;
-
 
 import java.util.*;
 
@@ -8,7 +8,7 @@ import vm.CategoryDesignVM;
 import vm.CategoryImplementVM;
 
 
-public class FunctorFailures extends HashMap<Trace, Trace>{
+public class FunctorFailures extends HashMap<Trace, Trace>{ //save two categories and a functor between them to an xml file
 
 	
 	private boolean compareObjects(Object<Process> dsgObj,Object<Process> impObj)
@@ -22,11 +22,11 @@ public class FunctorFailures extends HashMap<Trace, Trace>{
 			//System.out.println("alphabet");
 			return false;
 		}
-			for(Iterator dsgit=dsgData.getFailures().iterator(); dsgit.hasNext();)
+			for(Iterator<Failure> dsgit=dsgData.getFailures().iterator(); dsgit.hasNext();)
 			{
 				Failure dsgtmpf=(Failure)dsgit.next();
 				flag=false;
-				for(Iterator impit=impData.getFailures().iterator();impit.hasNext();)
+				for(Iterator<Failure> impit=impData.getFailures().iterator();impit.hasNext();)
 				{
 					Failure imptmpf=(Failure)impit.next();
 					if(Utilities.compTrace(dsgtmpf.getTrace(),imptmpf.getTrace()))
@@ -105,6 +105,7 @@ public class FunctorFailures extends HashMap<Trace, Trace>{
 		ts1.add(new Transition("1","pepsi","2"));
 		ts1.add(new Transition("1","coke","3"));
 		ts1.add(new Transition("1","tea","4"));
+		ts1.add(new Transition("4","tea","6"));
 		
 		Process vmi1=new Process(ts1);
 		
@@ -112,7 +113,7 @@ public class FunctorFailures extends HashMap<Trace, Trace>{
 		ts2.add(new Transition("0","coin","1"));
 		ts2.add(new Transition("1","pepsi","2"));
 		ts2.add(new Transition("1","coke","3"));
-		//  ts2.add(new Transition(1,"tea",4));
+		  ts2.add(new Transition(1,"tea",4));
 		
 		Process vmi2=new Process(ts2);
 		CategoryProcess cvmi1=new CategoryProcess(vmi1);

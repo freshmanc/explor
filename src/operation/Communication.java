@@ -21,7 +21,7 @@ public class Communication extends Process{
 	{
 		this.P=p;
 		this.Q=q;
-		this.alphabet=Utilities.HashSetToEventSet( Utilities.intersection((HashSet<String>)P.getAlphabet(), (HashSet<String>)Q.getAlphabet()));
+		this.alphabet= Utilities.intersection(P.getAlphabet(), Q.getAlphabet());
 		execute();
 	}
 	
@@ -34,30 +34,24 @@ public class Communication extends Process{
 	
 	private void buildInitialCommunication()
 	{
-		for(Iterator pit=P.getFailures().iterator();pit.hasNext();)
+		for(Iterator<Failure> pit=P.getFailures().iterator();pit.hasNext();)
 		{
-			Failure tmpfp=(Failure)pit.next();
+			Failure tmpfp=pit.next();
 			if(tmpfp.getTrace().size()==0)
 			{
-				for(Iterator qit=Q.getFailures().iterator();qit.hasNext();)
+				for(Iterator<Failure> qit=Q.getFailures().iterator();qit.hasNext();)
 				{
-					Failure tmpfq=(Failure)qit.next();
+					Failure tmpfq=qit.next();
 					if(tmpfq.getTrace().size()==0)
 					{
 						Failure tmp=new Failure();
 						tmp.setTrace(tmpfp.getTrace());
-						HashSet<String> evtsRP=Utilities.powerSetToSet(tmpfp.getRefusal());
-						HashSet<String> evtsRQ=Utilities.powerSetToSet(tmpfq.getRefusal());
-						//System.out.print(evtsRP+" "+evtsRQ);
-						HashSet<String> union=Utilities.union(evtsRP, evtsRQ);
-						HashSet<HashSet<String>> newPws=Utilities.powerSet(union);
+						EventSet evtsRP=Utilities.powerSetToSet(tmpfp.getRefusal());
+						EventSet evtsRQ=Utilities.powerSetToSet(tmpfq.getRefusal());
+						EventSet union=Utilities.union(evtsRP, evtsRQ);
+						Refusal newPws=Utilities.powerSet(union);
 						newPws.remove(new EventSet());
-						Refusal newRef=new Refusal(); 
-						for(Iterator<HashSet<String>> uit=newPws.iterator();uit.hasNext();)
-						{
-							newRef.add(uit.next());
-						}
-						tmp.setRefusal(newRef);
+						tmp.setRefusal(newPws);
 						this.failures.add(tmp);
 					}
 				}		
@@ -81,17 +75,12 @@ public class Communication extends Process{
 						{
 							Failure tmp=new Failure();
 							tmp.setTrace(tmpfp.getTrace());
-							HashSet<String> evtsRP=Utilities.powerSetToSet(tmpfp.getRefusal());
-							HashSet<String> evtsRQ=Utilities.powerSetToSet(tmpfq.getRefusal());
-							HashSet<String> union=Utilities.union(evtsRP, evtsRQ);
-							HashSet<HashSet<String>> newPws=Utilities.powerSet(union);
+							EventSet evtsRP=Utilities.powerSetToSet(tmpfp.getRefusal());
+							EventSet evtsRQ=Utilities.powerSetToSet(tmpfq.getRefusal());
+							EventSet union=Utilities.union(evtsRP, evtsRQ);
+							Refusal newPws=Utilities.powerSet(union);
 							newPws.remove(new EventSet());
-							Refusal newRef=new Refusal(); 
-							for(Iterator<HashSet<String>> uit=newPws.iterator();uit.hasNext();)
-							{
-								newRef.add(uit.next());
-							}
-							tmp.setRefusal(newRef);
+							tmp.setRefusal(newPws);
 							this.failures.add(tmp);
 							buildNextCommunication(tmpfp.getTrace());
 						}

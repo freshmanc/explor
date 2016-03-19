@@ -98,36 +98,78 @@ public class FilterProcessCategoryXML {
 
 		//transition system from design
 		TransitionSystem dsgT=new TransitionSystem();
-		dsgT.add(new Transition(0,"coin",1));
-		dsgT.add(new Transition(1,"coke",2));
-		dsgT.add(new Transition(1,"pepsi",3));
-		dsgT.add(new Transition(1,"tea",4));
+		dsgT.add(new Transition(0,"coin",1));	
+		dsgT.add(new Transition(1,"tea",2));
+		dsgT.add(new Transition(1,"coffee",3));
+		dsgT.add(new Transition(1,"refund",4));
 		Process dsgP=new Process(dsgT);
 	
 
 		//transition system from implementation
 		TransitionSystem impT1=new TransitionSystem();
-		impT1=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-3_VendingMachine.lts");
-		Process impP1=new Process(impT1);
-		//Utilities.printProcess(impP1);
+		impT1=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\dropbox\\Transitions\\vm-5_VendingMachine.lts");
+		//Utilities.printTransitionSystem(impT1);
+		impT1=Utilities.acyclicTransitionSystem(impT1);
+		impT1=Utilities.loopTransitionSystem(impT1, 2);
+		Utilities.printTransitionSystem(impT1);
+		Process p=new Process(impT1);
+		//Utilities.printProcess(p);
+		FailureTree ftp=new FailureTree(p);
+		//Utilities.printFailureTree(ftp);
+		EventSet newAlphabet=new EventSet();
+		newAlphabet.add("coin");
+		newAlphabet.add("refund");
+		newAlphabet.add("tea");
+		newAlphabet.add("coffee");
+		//newAlphabet.add("green");
+		//newAlphabet.add("red");
+		//newAlphabet.add("oolong");
+		//newAlphabet.add("espresso");
+		//newAlphabet.add("mocha");
+		//newAlphabet.add("cappuccino");
+		ftp=new EquivalentFailureTree(ftp, newAlphabet);
+		//Utilities.printFailureTree(ftp);
+		//Utilities.printProcess(ftp.treeToProcess());
 		
 		TransitionSystem impT2=new TransitionSystem();
-		impT2=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Desktop\\Transitions\\vm-3_Customer.lts");
-		Process impP2=new Process(impT2);
-		//Utilities.printProcess(impP2);
+		impT2=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\dropbox\\Transitions\\vm-5_VendingMachine.lts");
+		//Utilities.printTransitionSystem(impT2);
+		impT2=Utilities.acyclicTransitionSystem(impT2);
+		impT2=Utilities.loopTransitionSystem(impT2, 2);
+		//Utilities.printTransitionSystem(impT2);
+		Process p2=new Process(impT2);
+		//Utilities.printProcess(p2);
+		FailureTree ftp2=new FailureTree(p2);
+		//Utilities.printFailureTree(ftp2);
+		EventSet newAlphabet2=new EventSet();
+		newAlphabet2.add("coin");
+		newAlphabet2.add("refund");
+		newAlphabet2.add("tea");
+		newAlphabet2.add("coffee");
+		//newAlphabet2.add("green");
+		//newAlphabet2.add("red");
+		//newAlphabet2.add("oolong");
+		//newAlphabet2.add("espresso");
+		//newAlphabet2.add("mocha");
+		//newAlphabet2.add("cappuccino");
+		ftp2=new EquivalentFailureTree(ftp2, newAlphabet2);
+		//Utilities.printFailureTree(ftp2);
+		//Utilities.printProcess(ftp2.treeToProcess());
 		
-		Process comm=new Communication(impP2,impP1);
+
+		Process comm=new Communication(ftp.treeToProcess(),ftp2.treeToProcess());
 		Utilities.printProcess(comm);
 		
 		//generate failure tree for filtering
 		FailureTree impFt=new FailureTree(comm);
 		
+		
 		//events we want to analyze
 		EventSet evts=new EventSet();
 		evts.add("coin");
 		evts.add("tea");
-		evts.add("coke");
-		evts.add("pepsi");
+		evts.add("refund");
+		evts.add("coffee");
 
 		//failure tree after filtering
 		EquivalentFailureTree impEft=new EquivalentFailureTree(impFt,evts);
@@ -140,7 +182,7 @@ public class FilterProcessCategoryXML {
 		
 		//generate concrete categories with more info for xml
 		ConcreteCategoryProcess filterCcp=new ConcreteCategoryProcess(filteredCategory,"filteredCategory","filter");
-		ConcreteCategoryProcess origCcp=new ConcreteCategoryProcess(origCategory,"origCategory","original");
+		ConcreteCategoryProcess origCcp=new ConcreteCategoryProcess(origCategory,"origCategory","implement");
 		
 		//add concrete categories into a set
 		ConcreteCategoryProcesses cps=new ConcreteCategoryProcesses();
@@ -155,7 +197,7 @@ public class FilterProcessCategoryXML {
 		CategoryProcess dsgCp=new CategoryProcess(dsgP);
 		
 		//generate concrete categories
-		ConcreteCategoryProcess impCcp=new ConcreteCategoryProcess(filteredCategory,"filteredCategory","implement");
+		ConcreteCategoryProcess impCcp=new ConcreteCategoryProcess(filteredCategory,"filteredCategory","implementation");
 		ConcreteCategoryProcess dsgCcp=new ConcreteCategoryProcess(dsgCp,"designedCategory","design");
 		
 		//add concrete categories into a set

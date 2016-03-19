@@ -1,3 +1,4 @@
+//developer ming zhu
 package persistence;
 
 import java.io.File;
@@ -34,7 +35,7 @@ import java.util.*;
 import java.awt.Desktop;
 import java.net.URI;
 
-public class ProcessCategoryXML {
+public class ProcessCategoryXML {//create an xml file for a category of process
 	
 	public ProcessCategoryXML(HashSet<ConcreteCategoryProcess> ps)
 	{ 

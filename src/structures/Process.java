@@ -14,10 +14,9 @@ public class Process {
 	public void setAlphabet(EventSet alphabet) {
 		for(Iterator it=alphabet.iterator();it.hasNext();)
 		{
-			String tmp=new String((String)it.next());
+			String tmp=new String((String)it.next()); //create a new string
 			this.alphabet.add(tmp);
 		}
-		//this.alphabet = alphabet;
 	}
 
 	public Failures getFailures() {
@@ -25,28 +24,26 @@ public class Process {
 	}
 
 	public void setFailures(Failures failures) {
-		for(Iterator it=failures.iterator();it.hasNext();)
+		for(Iterator<Failure> it=failures.iterator();it.hasNext();)
 		{
-			Failure failure=(Failure)it.next();
-			Failure tmp=new Failure();
+			Failure failure=it.next();
+			Failure tmp=new Failure(); //create a new object failure
 			tmp.setTrace((Trace) failure.getTrace().clone());
 			
 			tmp.setRefusal((Refusal) failure.getRefusal().clone());
 			this.failures.add(tmp);
 		}
-		//this.failures = failures;
 	}
 
 
-	public Process()
+	public Process() //initiate process
 	{
 		this.alphabet=new EventSet();
 		this.failures=new Failures();
 	}
 	
-	public Process(TransitionSystem ts)
+	public Process(TransitionSystem ts) //generate process from transition system
 	{	
-	      //this.ts=ts;
 	      this.alphabet=new EventSet();
 	      this.failures=new Failures();
 	      Trace trace=new Trace();
@@ -62,11 +59,11 @@ public class Process {
 		Transition tempTst;
 	    EventSet psbEvt=new EventSet(); //set of possible next events
 		Failure failure=new Failure();
-		HashSet<HashSet<String>> powerset;
+		Refusal powerset;
 		
-		for(Iterator it=ts.iterator();it.hasNext();)//check each path in the transition system
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)//check each path in the transition system
 		{
-			tempTst=(Transition)it.next();
+			tempTst=it.next();
 			if(tempTst.getFrom().equals(from))
 			{
 				Trace tmpTrace=new Trace(trace);
@@ -77,17 +74,8 @@ public class Process {
 		}
 
 		powerset=Utilities.powerSet(Utilities.setDiff(psbEvt,alphabet));//find refusal set
-
-		
-		HashSet<String> tempHS;
-
-		for(Iterator it=powerset.iterator();it.hasNext();)
-		{	
-			tempHS=(HashSet<String>)it.next();
-
-			failure.getRefusal().add(tempHS);
-		}
-		failure.getRefusal().remove(new EventSet());
+		failure.setRefusal(powerset);
+		failure.getRefusal().remove(new EventSet()); //remove {} empty event set
 		failure.setTrace(trace);
 		failures.add(failure);
 		
@@ -98,7 +86,7 @@ public class Process {
 	{
 		Transition temp;
 
-		for(Iterator it=ts.iterator();it.hasNext();)
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
 		{
 			temp=(Transition)it.next();
 			if(temp.getFrom().equals(from))
@@ -118,10 +106,7 @@ public class Process {
 		ts1.add(new Transition("0","coin","1"));
 		ts1.add(new Transition("1","pepsi","2"));
 		ts1.add(new Transition("1","coke","3"));
-		ts1.add(new Transition("1","pushbutton","4"));
-		ts1.add(new Transition("4","select","5"));
-		ts1.add(new Transition("5","tea","6"));
-		ts1.add(new Transition("6","ok","7"));
+		ts1.add(new Transition("1","tea","6"));
 		
 		
 		Process vmi1=new Process(ts1);

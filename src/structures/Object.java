@@ -1,13 +1,12 @@
 package structures;
 import java.util.*;
 
-public class Object<T>{
+public class Object<T>{ 
 	
-		private T data;
-		private Trace trace;
+		private T data;  //the data of the object
+		private Trace trace; //longest trace of the object
 
-		//private Object<T> parent;
-	    private List<Object<T>> children;
+	    private List<Object<T>> children; //connected to next objects by morphisms
 
 	    public Object(T process) {
 	        this.data = process;

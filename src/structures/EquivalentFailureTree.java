@@ -1,3 +1,5 @@
+//developer ming zhu
+
 package structures;
 
 import java.util.*;
@@ -7,14 +9,14 @@ import utilities.*;
 
 public class EquivalentFailureTree extends FailureTree{
 
-	private List<FailureTreeNode> nodeList;
-	private List<HashSet<FailureTreeNode>> nodeSetList;
+	private List<FailureTreeNode> nodeList;// a list of FailureTree node
+	private List<HashSet<FailureTreeNode>> nodeSetList;// a list of a set of FailureTree node. each set is mapped to a node in the same index of nodeList
 
-	public EquivalentFailureTree(FailureTree ft, EventSet evts)
+	public EquivalentFailureTree(FailureTree ft, EventSet evts)//ft is the tree will be filtered, evts are the events used to filter
 	{
 		nodeList=new ArrayList<FailureTreeNode>();
 		nodeSetList=new ArrayList<HashSet<FailureTreeNode>>();
-		this.setAlphabet(evts);
+		this.setAlphabet(evts); 
 		this.setRoot(buildNode(ft.getRoot(),evts));
 		buildChildrenEquivalentFailureTree(this.getRoot(),ft.getRoot(),evts);
 	}
@@ -30,7 +32,6 @@ public class EquivalentFailureTree extends FailureTree{
 				FailureTreeNode ftntmp=it.next();
 				//System.out.println(ftntmp.getData().getTrace()+" with "+ftntmp.getData().getRefusal());
 				FailureTreeNode child=buildNode(ftntmp,evts);
-				child.setParent(node);
 				node.addChild(child);
 				buildChildrenEquivalentFailureTree(child,ftntmp,evts);
 			}
@@ -52,11 +53,10 @@ public class EquivalentFailureTree extends FailureTree{
 	public FailureTreeNode buildNode(FailureTreeNode ftn,EventSet evts) //find equivalent nodes and nodes mapped to it
 	{
 		FailureTreeNode node=new FailureTreeNode();
-		node.setParent(null);
 		
-		HashSet<HashSet<String>> pwtevts=Utilities.powerSet(evts); 
+		Refusal pwtevts=Utilities.powerSet(evts); 
 		pwtevts.remove(new EventSet());
-		for(Iterator<HashSet<String>> it=pwtevts.iterator();it.hasNext();) //refusal is initialized as powerset of evts
+		for(Iterator<EventSet> it=pwtevts.iterator();it.hasNext();) //refusal is initialized as powerset of evts
 		{
 			node.getData().getRefusal().add(it.next());
 		}
@@ -72,9 +72,9 @@ public class EquivalentFailureTree extends FailureTree{
 			//System.out.println(ftn.getData().getTrace()+":"+ftntmp.getData().getTrace()+":"+ftntmp.getData().getRefusal());
 			Refusal r=ftntmp.getData().getRefusal();
 			r=Utilities.filterRefursal(r, evts);
-			HashSet<HashSet<String>> pwttmp=Utilities.intersection(node.getData().getRefusal(), r);// refusal = intersection of all refusals
+			Refusal pwttmp=Utilities.intersection(node.getData().getRefusal(), r);// refusal = intersection of all refusals
 			node.getData().getRefusal().clear();
-			for(Iterator<HashSet<String>> itp=pwttmp.iterator();itp.hasNext();)
+			for(Iterator<EventSet> itp=pwttmp.iterator();itp.hasNext();)
 			{
 				node.getData().getRefusal().add(itp.next());
 			}

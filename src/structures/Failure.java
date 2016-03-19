@@ -25,7 +25,7 @@ public class Failure {
 	
 	public void setRefusal(Refusal refusal) {
 		Refusal r=new Refusal();
-		for(Iterator<HashSet<String>> it=refusal.iterator();it.hasNext();)
+		for(Iterator<EventSet> it=refusal.iterator();it.hasNext();)
 		{
 			r.add(it.next());
 		}

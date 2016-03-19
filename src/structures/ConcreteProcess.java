@@ -1,6 +1,7 @@
+//developer ming zhu
 package structures;
 
-public class ConcreteProcess {
+public class ConcreteProcess { // give a process name and type
 	public Process getProcess() {
 		return p;
 	}

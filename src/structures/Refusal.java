@@ -1,6 +1,6 @@
 package structures;
 import java.util.*;
 
-public class Refusal extends HashSet<HashSet<String>>{
+public class Refusal extends HashSet<EventSet>{
 
 }

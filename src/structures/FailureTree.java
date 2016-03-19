@@ -1,3 +1,5 @@
+//developer ming zhu
+
 package structures;
 import java.util.*;
 
@@ -64,8 +66,8 @@ public class FailureTree { //make the process as a tree, each node contains a tr
 	
 	private void buildSubTree(Failure failure, FailureTreeNode node, Process p) 
 	{
-		HashSet<String> refusalEvents=Utilities.powerSetToSet(failure.getRefusal());
-		if(Utilities.compareEventSets(Utilities.HashSetToEventSet(refusalEvents),p.getAlphabet())==false)//if the node has successors, the refusal will be not equal to the alphabet
+		EventSet refusalEvents=Utilities.powerSetToSet(failure.getRefusal());
+		if(Utilities.compareEventSets(refusalEvents,p.getAlphabet())==false)//if the node has successors, the refusal will be not equal to the alphabet
 		{
 			for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
 			{
@@ -74,7 +76,7 @@ public class FailureTree { //make the process as a tree, each node contains a tr
 				if(Utilities.subTrace(failure.getTrace(),tmpf.getTrace()) && (failure.getTrace().size()+1)==tmpf.getTrace().size())
 				{
 					FailureTreeNode child=new FailureTreeNode(tmpf);
-					child.setParent(node);
+					//child.setParent(node);
 					node.addChild(child);
 					buildSubTree(tmpf,child, p);
 				}
@@ -104,19 +106,12 @@ public class FailureTree { //make the process as a tree, each node contains a tr
 		ts2.add(new Transition("0","coin","1"));
 		//ts2.add(new Transition(1,"push",9));
 		ts2.add(new Transition("1","tea","10"));
-		ts2.add(new Transition("10","pepsi","11"));
-		ts2.add(new Transition("11","coke","12"));
+
 		
 		ts2.add(new Transition("1","coke","2"));
-		ts2.add(new Transition("2","pepsi","5"));
-		//ts2.add(new Transition(5,"push",6));
-		//ts2.add(new Transition(6,"button",7));
-		ts2.add(new Transition("5","tea","13"));
+
 		
-		//ts2.add(new Transition(2,"push",3));
-		ts2.add(new Transition("2","tea","4"));
-		//ts2.add(new Transition(4,"button",14));
-		ts2.add(new Transition("4","pepsi","8"));
+		ts2.add(new Transition("1","pepsi","8"));
 		
 		
 		Process vmi2=new Process(ts2);

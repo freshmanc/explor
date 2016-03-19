@@ -1,6 +1,8 @@
+//developer ming zhu
+
 package structures;
 
-public class ConcreteCategoryProcess {
+public class ConcreteCategoryProcess { // give a category of process name and type
 	public CategoryProcess getCategoryProcess() {
 		return cp;
 	}

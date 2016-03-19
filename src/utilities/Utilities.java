@@ -1,5 +1,9 @@
+//developer Ming Zhu
+//functions used to operate on structures
+
 package utilities;
 import java.util.*;
+
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -11,28 +15,54 @@ import structures.*;
 
 public class Utilities{
 
-	public static <T> boolean belongs( T elm, HashSet<T> set)
+	public static boolean belongs(String elm, EventSet set)//check if elm inside of set
 	{
-		for(Iterator<T> itr=set.iterator();itr.hasNext();)
+		for(Iterator<String> it=set.iterator();it.hasNext();)
 		{
-			if(itr.next().equals(elm))
+			if(it.next().equals(elm))
 				return true;
 		}
 		return false;
 	}
-
-	public static <T> boolean subSet(HashSet<T> x, HashSet<T> y)
+	
+	public static boolean belongs(EventSet elm, Refusal ref)
 	{
-	   boolean sub = true;
-	   for (Iterator ix=x.iterator(); ix.hasNext(); )
-	   {   
-	      if ( ! belongs((T)ix.next(), y))
-	      {
-	         sub = false;
-	         break;
-	      }
-	   }
-	   return sub;
+		for(Iterator<EventSet> it=ref.iterator();it.hasNext();)
+		{
+			EventSet tmp=it.next();
+			if(Utilities.subSet(elm, tmp)&&Utilities.subSet(tmp, elm))
+				return true;
+		}
+		return false;
+	}
+	
+	
+	public static boolean subSet(Refusal x, Refusal y)
+	{
+		boolean sub=true;
+		for(Iterator<EventSet> ix=x.iterator();ix.hasNext();)
+		{
+			if(!belongs(ix.next(),y))
+			{
+				sub=false;
+				break;
+			}
+		}
+		return sub;
+	}
+	
+	public static boolean subSet(EventSet x, EventSet y)// check if x is a subset of y
+	{
+		boolean sub=true;
+		for(Iterator<String> ix=x.iterator();ix.hasNext();)
+		{
+			if(!belongs(ix.next(),y))
+			{
+				sub=false;
+				break;
+			}
+		}
+		return sub;
 	}
 		
 	
@@ -44,7 +74,7 @@ public class Utilities{
 	        return String.format("%s",d);
 	}
 	
-	public static String findInitialState(TransitionSystem ts)
+	public static String findInitialState(TransitionSystem ts)// initial state has the smallest value in "From"
 	{
 		double init=Double.MAX_VALUE;
     	for(Iterator<Transition> it=ts.iterator();it.hasNext();)
@@ -60,7 +90,7 @@ public class Utilities{
     	return numberFmt(init);
 	}
 	
-	public static boolean subTrace(Trace a, Trace b)
+	public static boolean subTrace(Trace a, Trace b)// check if a is a sub trace of b (a,b should have the same initial element)
 	{
 		Iterator<String> ia=a.iterator();
 		Iterator<String> ib=b.iterator();
@@ -78,52 +108,51 @@ public class Utilities{
 		return true;
 	}
 	
-	public static <T> HashSet<T> powerSetToSet(HashSet<HashSet<T>> pws)
+	
+	public static  EventSet powerSetToSet(Refusal pws)// generate original events from powerset
 	{	
-		HashSet<T> set=new HashSet<T>();
-		for(Iterator<HashSet<T>> it=pws.iterator();it.hasNext();)
+		EventSet set=new EventSet(); 
+		for(Iterator<EventSet> it=pws.iterator();it.hasNext();)
 		{
-			HashSet<T> tmp=it.next();
+			EventSet tmp=it.next();
 			set.addAll(Utilities.union(set, tmp));
 		}
 		return set;
 	}
 	
-	public static  HashSet<String> powerSetToSet(Refusal pws)
-	{	
-		HashSet<String> set=new HashSet<String>();
-		for(Iterator<HashSet<String>> it=pws.iterator();it.hasNext();)
+	public static Refusal powerSet(EventSet originalSet) // from EventSet to Refusal
+	{
+		Refusal sets=new Refusal();
+		if(originalSet.isEmpty())
 		{
-			HashSet<String> tmp=it.next();
-			set.addAll(Utilities.union(set, tmp));
+			sets.add(new EventSet());
+			return sets;
 		}
-		return set;
-	}
-	
-	public static <T> HashSet<HashSet<T>> powerSet(HashSet<T> originalSet) {
-		    HashSet<HashSet<T>> sets = new HashSet<HashSet<T>>();
-		    if (originalSet.isEmpty()) {
-		    	sets.add(new HashSet<T>());
-		    	return sets;
-		    }
-		    
-		    List<T> list = new ArrayList<T>(originalSet);
-		    T head = list.get(0);
-		    HashSet<T> rest = new HashSet<T>(list.subList(1, list.size())); 
-		    
-		    
-		    for (HashSet<T> set : powerSet(rest)) {
-		    	HashSet<T> newSet = new HashSet<T>();
-		    	newSet.add(head);
-		    	newSet.addAll(set);
-		    	sets.add(newSet);
-		    	sets.add(set);
-		    }		
-		    return sets;
-	}
+		
+		String head=new String();
+		Iterator<String> it=originalSet.iterator();
+		if(it.hasNext())
+			head=it.next();
+		EventSet rest=new EventSet();
+		while(it.hasNext())
+		{
+			rest.add(it.next());
+		}
 
+		for(Iterator<EventSet> rit=powerSet(rest).iterator();rit.hasNext();)
+		{
+			EventSet set=rit.next();
+	    	EventSet newSet = new EventSet();
+	    	newSet.add(head);
+	    	newSet.addAll(set);
+	    	sets.add(newSet);
+	    	sets.add(set);
+		}
+		return sets;
+	}
 	
-	public static Trace filterTrace(Trace t, EventSet evts) //remove events from trace
+	
+	public static Trace filterTrace(Trace t, EventSet evts) //remove events in evts from trace t
 	{
 		Trace nt=new Trace();
 		for(Iterator<String> it=t.iterator();it.hasNext();)
@@ -137,12 +166,12 @@ public class Utilities{
 		return nt;
 	}
 	
-	public static Refusal filterRefursal(HashSet<HashSet<String>> f, EventSet evts) //remove events from refusal
+	public static Refusal filterRefursal(Refusal f, EventSet evts) //remove events from refusal
 	{
 		Refusal nf=new Refusal();
-		for(Iterator<HashSet<String>> it=f.iterator();it.hasNext();)
+		for(Iterator<EventSet> it=f.iterator();it.hasNext();)
 		{
-			nf.add(Utilities.HashSetToEventSet( Utilities.intersection(it.next(), evts)));
+			nf.add( Utilities.intersection(it.next(), evts));
 		}
 		nf.remove(new EventSet());
 		return nf;
@@ -158,23 +187,21 @@ public class Utilities{
 	
 	private static boolean addTransitionWillCreateLoop(TransitionSystem ts, Transition t) //check if there are any transitions from "state" back to "state"
 	{
-		//System.out.println("stateExistInLoop");
 		TransitionSystem nts=new TransitionSystem();
 		nts.addAll(ts);
 		nts.add(t);
 		String state=t.getFrom();
 		
-		LinkedList<String> queue=new LinkedList<String>();
+		LinkedList<String> queue=new LinkedList<String>(); //a set of states that have not been visited
 		queue.add(state);
 		TransitionSystem tmpTs;
 		while(queue.isEmpty()!=true)
 		{
-			tmpTs=Utilities.nextTransitions(nts, queue.removeFirst());
+			tmpTs=Utilities.nextImmediateTransitions(nts, queue.removeFirst());
 			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
 			{
 				Transition tmpT=it.next();
-				//System.out.println(tmpT.getFrom());
-				if(tmpT.getTo().equals(state))
+				if(tmpT.getTo().equals(state)) //from state to state, a loop
 				{
 					return true;
 				}
@@ -267,7 +294,7 @@ public class Utilities{
 		queue.add(state);
 		while(queue.isEmpty()!=true)
 		{
-			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());
+			tmpTs=Utilities.nextImmediateTransitions(ts, queue.removeFirst());
 			nts.addAll(tmpTs);
 			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
 				queue.add(it.next().getTo());
@@ -276,7 +303,7 @@ public class Utilities{
 	}
 	
 	//this is for finding state which had successors in cyclic transition system
-	private static HashSet<String> findStateWithSuccessors(TransitionSystem ts) //find which sates was in a loop in previous transition system
+	private static HashSet<String> findStateWithSuccessors(TransitionSystem ts) //find which states was in a loop in previous transition system, it has ^ in it
 	{
 		HashSet<String> set=new HashSet<String>();
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
@@ -300,7 +327,7 @@ public class Utilities{
 		queue.add(state);
 		while(queue.isEmpty()!=true)
 		{
-			tmpTs=Utilities.nextTransitions(ts, queue.removeFirst());			
+			tmpTs=Utilities.nextImmediateTransitions(ts, queue.removeFirst());			
 			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
 			{
 				Transition tmpT=it.next();
@@ -325,11 +352,10 @@ public class Utilities{
 	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)// break the loop of the transition system
 	{
 		String init=Utilities.findInitialState(ts);
-		//System.out.println("acyclicTransitionSystem"+ " initial:"+ init);
 		return Utilities.acyclicTransitionSystemFromState(ts, init);
 	}
 	
-	public static TransitionSystem nextTransitions(TransitionSystem ts, String from)// find all immediate transitions started from "from"
+	public static TransitionSystem nextImmediateTransitions(TransitionSystem ts, String from)// find all immediate transitions started from "from"
 	{
 		//System.out.println("nextTransitions");
 		TransitionSystem nextTransitions=new TransitionSystem();
@@ -345,15 +371,7 @@ public class Utilities{
 		return nextTransitions;
 	}
 	
-	public static EventSet HashSetToEventSet(HashSet<String> hset)//change hashset to eventset
-	{
-		EventSet eset=new EventSet();
-		for(Iterator it=hset.iterator();it.hasNext();)
-		{
-			eset.add((String)it.next());
-		}
-		return eset;
-	}
+
 	
 	public static void ExtendEventsToProcess(Process p,EventSet e) //when two process deterministic select, nondeterministic, execute sequentially, loop, the alphabet and refusals need to be extended
 	{
@@ -361,24 +379,24 @@ public class Utilities{
 		for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();)  //extend each failure
 		{
 			Failure tmpf=pit.next();
-			EventSet tmpp=Utilities.HashSetToEventSet(Utilities.powerSetToSet(tmpf.getRefusal())); //get events in refusal
-			EventSet diff=Utilities.HashSetToEventSet(Utilities.setDiff(tmpp, p.getAlphabet())); //find other events not in refusal but in alphabet
-			EventSet intec=Utilities.HashSetToEventSet(Utilities.intersection(diff, e)); //find out events not in refusal but in the alphabet and the set e
-			EventSet tmpq=Utilities.HashSetToEventSet(Utilities.setDiff(e, intec)); 
-			EventSet tmppq=Utilities.HashSetToEventSet(Utilities.union(tmpp,tmpq));
-			HashSet<HashSet<String>> tmpr=Utilities.powerSet(tmppq);
-			tmpr.remove(new HashSet<String>());// remove empty set
+			EventSet tmpp=Utilities.powerSetToSet(tmpf.getRefusal()); //get events in refusal
+			EventSet diff=Utilities.setDiff(tmpp, p.getAlphabet()); //find other events not in refusal but in alphabet
+			EventSet intec=Utilities.intersection(diff, e); //find out events not in refusal but in the alphabet and the set e
+			EventSet tmpq=Utilities.setDiff(e, intec); 
+			EventSet tmppq=Utilities.union(tmpp,tmpq);
+			Refusal tmpr=Utilities.powerSet(tmppq);
+			tmpr.remove(new EventSet());// remove empty set
 			Refusal rf=new Refusal();
-			for(Iterator nit=tmpr.iterator();nit.hasNext();)
+			for(Iterator<EventSet> nit=tmpr.iterator();nit.hasNext();)
 			{
-				rf.add(Utilities.HashSetToEventSet((HashSet<String>)nit.next()));
+				rf.add(nit.next());
 			}
 			tmpf.setRefusal(rf);
 		}
 	}
 
 	
-	public static EventSet union(EventSet x, EventSet y)
+	public static EventSet union(EventSet x, EventSet y) //union for EventSet
 	{
 		EventSet u = new EventSet();
 		  for(Iterator<String> j=x.iterator();j.hasNext();)
@@ -390,30 +408,31 @@ public class Utilities{
 		   return u;
 	}
 	
-	public static <T> HashSet<T> union(HashSet<T> x, HashSet<T> y)
-	{
-	  HashSet<T> u = new HashSet<T>();
-	  for(Iterator<T> j=x.iterator();j.hasNext();)
-	  {
-		  u.add(j.next());
-	  }
-	   for (Iterator<T> i= y.iterator(); i.hasNext(); )
-		   u.add(i.next());
-	   return u;
-	}
 	
-
-	public static <T> HashSet<T> intersection(HashSet<T> x, HashSet<T> y)
+	public static Refusal intersection(Refusal x, Refusal y)//intersection of Refusal
 	{
-		HashSet<T> its = new HashSet<T>();
-		T temp;
-		for (Iterator i = x.iterator(); i.hasNext(); )
+		Refusal its=new Refusal();
+		EventSet temp;
+		for(Iterator<EventSet> it=x.iterator();it.hasNext();)
 		{
-			temp=(T)i.next();
-			if (belongs(temp, y))
+			temp=it.next();
+			if(Utilities.belongs(temp, y))
 				its.add(temp);
 		}
-	   return its;
+		return its;
+	}
+
+	public static EventSet intersection(EventSet x, EventSet y) //intersection of EventSet
+	{
+		EventSet its=new EventSet();
+		String temp;
+		for(Iterator<String> it=x.iterator();it.hasNext();)
+		{
+			temp=it.next();
+			if(Utilities.belongs(temp, y))
+				its.add(temp);
+		}
+		return its;
 	}
 	
 
@@ -427,38 +446,36 @@ public class Utilities{
 			return false;
 	}
 
-	
 
-	public static  <T> HashSet<T> setDiff(HashSet<T> x, HashSet<T> y)
+	public static EventSet setDiff(EventSet x, EventSet y) //find difference between EventSets
 	{
-	   HashSet<T> diff=new HashSet<T>();
-	   HashSet<T> insec=intersection(x,y);
-	   T temp;
-	   for(Iterator i=x.iterator();i.hasNext();)
-	   {
-		   temp=(T)i.next();
-		   if(!belongs(temp,insec))
-			   diff.add(temp);
-	   }
-	   for(Iterator i=y.iterator();i.hasNext();)
-	   {
-		   temp=(T)i.next();
-		   if(!belongs(temp,insec))
-			   diff.add(temp);
-	   }
-	   return diff;
+		EventSet diff=new EventSet();
+		EventSet insec=Utilities.intersection(x, y);
+		String temp=new String();
+		for(Iterator<String> itx=x.iterator();itx.hasNext();)
+		{
+			temp=itx.next();
+			if(!Utilities.belongs(temp, insec))
+				diff.add(temp);
+		}
+		for(Iterator<String> ity=y.iterator();ity.hasNext();)
+		{
+			temp=ity.next();
+			if(!Utilities.belongs(temp, insec))
+				diff.add(temp);
+		}
+		return diff;
 	}
 	
-	public static Failure searchFailureByTrace(Trace trace,Process process)
+	
+	public static Failure searchFailureByTrace(Trace trace,Process process) //find the failure that have the trace
 	{
 		Failure tmpf;
-		for(Iterator it=process.getFailures().iterator();it.hasNext();)
+		for(Iterator<Failure> it=process.getFailures().iterator();it.hasNext();)
 		{
-			tmpf=(Failure)it.next();
+			tmpf=it.next();
 			if(Utilities.compTrace(trace, tmpf.getTrace()))
 			{
-				//System.out.println(tmpf.getTrace());
-				//System.out.println(tmpf.getRefusal());
 				return tmpf;
 			}
 		}
@@ -469,48 +486,21 @@ public class Utilities{
 	{
 		System.out.println("Level "+level);
 		System.out.println("largest trace: "+current.getTrace());
-		for(Iterator it=current.getData().getFailures().iterator();it.hasNext();)
+		for(Iterator<Failure> it=current.getData().getFailures().iterator();it.hasNext();)
 		{
-			Failure f=(Failure)it.next();
+			Failure f=it.next();
 			System.out.println("Trace: "+f.getTrace());
-			//System.out.print("<");
-			//for(Iterator tit=f.getTrace().iterator();tit.hasNext();)
-			//{
-			//	 System.out.print(tit.next());
-			//	if(f.getTrace().size()>1&&tit.hasNext())
-			//	 System.out.print(",");
-			//}
-			//System.out.print(">, {");
 			System.out.println("Refusal: "+f.getRefusal());
-			//for(Iterator rit=f.getRefusal().iterator();rit.hasNext();)
-			//{
-			//	HashSet<String> es=(HashSet)rit.next();
-			//	if(es.size()>0)
-			//	{
-			//		System.out.print("{");
-			//		for(Iterator eit=es.iterator();eit.hasNext();)
-			//		{
-			//			System.out.print(eit.next());
-			//			if(es.size()>1&&eit.hasNext())
-			//				System.out.print(",");
-			//		}
-			//		System.out.print("}");
-			//	}
-			//	if(es.size()>0&&rit.hasNext())
-			//		 System.out.print(",");
-				
-			//}
-			//System.out.println("}");
 		}
 		System.out.println("-----------------");
-		for(Iterator xt=current.getChildren().iterator();xt.hasNext();)
+		for(Iterator<Object<Process>> xt=current.getChildren().iterator();xt.hasNext();)
 		{
-			Object<Process> tmp=(Object<Process>)xt.next();
+			Object<Process> tmp=xt.next();
 			printCategory(tmp,level+1);
 		}
 	}
 	
-	public static FailureTreeNode searchNodeInFailureTree(Failure failure,FailureTreeNode node)
+	public static FailureTreeNode searchNodeInFailureTree(Failure failure,FailureTreeNode node) //find the node that has the failure in data
 	{
 		Failure tmpData=node.getData();
 		FailureTreeNode ftn;
@@ -584,14 +574,14 @@ public class Utilities{
 	}
 	
 	
-	public static TraceSet searchSuccessfulTraces(Process p)
+	public static TraceSet searchSuccessfulTraces(Process p) //find successful traces
 	{
 		TraceSet traces=new TraceSet();
 		searchLongestTraces(new Trace(),traces,p);
 		return traces;
 	}
 	
-	private static void searchLongestTraces(Trace trace,TraceSet traces, Process p)
+	private static void searchLongestTraces(Trace trace,TraceSet traces, Process p) //find the longest traces
 	{
 		boolean flag=false;
 		for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();)
@@ -610,7 +600,7 @@ public class Utilities{
 		}
 	}
 	
-	public static void extendFailures(Process p, EventSet events)
+	public static void extendFailures(Process p, EventSet events)// extend failures with events
 	{
 		p.setAlphabet((EventSet)Utilities.union(p.getAlphabet(),events));
 		for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
@@ -620,32 +610,9 @@ public class Utilities{
 		}
 	}
 	
-	public static boolean compareEventSets(EventSet evts1, EventSet evts2)
+	public static boolean compareEventSets(EventSet evts1, EventSet evts2)//compare EventSets
 	{
-		boolean flag= false;
-		if(evts1.size()==evts2.size())
-		{
-			for(Iterator<String> it1=evts1.iterator();it1.hasNext();)
-			{
-				flag=false;
-				String tmp1=it1.next();
-				for(Iterator<String> it2=evts2.iterator();it2.hasNext();)
-				{
-					String tmp2=it2.next();
-					if(tmp2.equals(tmp1))
-					{
-						flag=true;
-						break;
-					}
-				}
-				if(flag==false)
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
+		return Utilities.subSet(evts1, evts2)&&Utilities.subSet(evts2, evts1);
 	}
 
 	public static void CategoryProcessToXML(Element elm, Document doc, CategoryProcess cp)
@@ -706,7 +673,7 @@ public class Utilities{
 		{
 			failure2=(Failure)it.next();
 			System.out.println("Trace: "+failure2.getTrace());
-			System.out.println("Refusal: "+failure2.getRefusal());
+			System.out.println("Refusal: "+Utilities.powerSetToSet(failure2.getRefusal()));
 		}
 	}
 	
@@ -741,7 +708,7 @@ public class Utilities{
 		EventSet set=new EventSet();
 		set.add("coke");
 		set.add("pepsi");
-		set.add("tea");
+		//set.add("tea");
 		set.add("coin");
 		set.add("push");
 		set.add("choose");
@@ -751,11 +718,14 @@ public class Utilities{
 		set1.add("pepsi");
 		set1.add("tea");
 		set1.add("coin");
-		HashSet<HashSet<String>> rf=Utilities.powerSet(set);
-		HashSet<HashSet<String>> hs=Utilities.filterRefursal(rf, set1);
-		HashSet<HashSet<String>> rf1=Utilities.powerSet(set1);
-		System.out.println(hs);		
-		System.out.println(rf1);
+		Refusal rf=Utilities.powerSet(set);
+		System.out.println(Utilities.setDiff(set, set1));
+		System.out.println(Utilities.intersection(set, set1));
+		//System.out.println(rf);
+		//HashSet<HashSet<String>> hs=Utilities.filterRefursal(rf, set1);
+		//HashSet<HashSet<String>> rf1=Utilities.powerSet(set1);
+//		System.out.println(hs);		
+//		System.out.println(rf1);
 	}
 
 }
