@@ -1,3 +1,5 @@
+//developer ming zhu
+
 package operation;
 
 import java.util.HashSet;
@@ -14,25 +16,22 @@ public class SequentialProcesses extends Process{ //build sequential processes
 		this.alphabet=(EventSet) Utilities.union(p.getAlphabet(), q.getAlphabet());
 		Utilities.ExtendEventsToProcess(p, q.getAlphabet());
 		Utilities.ExtendEventsToProcess(q, p.getAlphabet());
-		HashSet sucSet=Utilities.searchSuccessfulTraces(p);
-		Failure qnil=null;
-		Failures exp=new Failures();
-		for(Iterator qit=q.getFailures().iterator();qit.hasNext();)
+		HashSet<Trace> sucSet=Utilities.searchSuccessfulTraces(p); //find a set of largest traces
+		Failure qnil=null; //failure with empty trace
+		Failures exp=new Failures(); //failures of extended q 
+		for(Iterator<Failure> qit=q.getFailures().iterator();qit.hasNext();) // find the empty trace
 		{
-			Failure tmpfq=(Failure)qit.next();
+			Failure tmpfq=qit.next();
 			if(tmpfq.getTrace().equals(new Trace()))
 			{
 				qnil=tmpfq;
-				//System.out.println("-------------");
-				//System.out.println(qnil.getTrace());
-				//System.out.println(qnil.getRefusal());
-				//System.out.println("-------------");
 			}
 		}
-		for(Iterator it=sucSet.iterator();it.hasNext();)
+		
+		for(Iterator<Trace> it=sucSet.iterator();it.hasNext();) // replace the refusal of each largest trace by using  the empty trace
 		{
-			Trace tmpt=(Trace)it.next();
-			for(Iterator pit=p.getFailures().iterator();pit.hasNext();)
+			Trace tmpt=it.next();
+			for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();) //find the failures of the largest trace
 			{
 				Failure tmpfp=(Failure)pit.next();
 				if(tmpfp.getTrace().equals(tmpt))
@@ -41,25 +40,25 @@ public class SequentialProcesses extends Process{ //build sequential processes
 				}
 			}
 		}
-		q.getFailures().remove(qnil);
+		q.getFailures().remove(qnil); //remove the empty trace from failure temporarily
 		
 		
-		for(Iterator it=sucSet.iterator();it.hasNext();)
+		for(Iterator<Trace> it=sucSet.iterator();it.hasNext();) //extend the each trace of q by useing each largest trace of p
 		{
 			Trace tmpts=(Trace)it.next();
-			for(Iterator qit=q.getFailures().iterator();qit.hasNext();)
+			for(Iterator<Failure> qit=q.getFailures().iterator();qit.hasNext();)
 			{
-				Failure tmpfq=(Failure)qit.next();
-				Failure nf=new Failure();
-				for(Iterator sit=tmpts.iterator();sit.hasNext();)
+				Failure tmpfq=qit.next();
+				Failure nf=new Failure();//new failure to copy the failure in q
+				for(Iterator<String> sit=tmpts.iterator();sit.hasNext();) //events from the largest trace 
 				{
 					nf.getTrace().add((String)sit.next());
 				}
-				for(Iterator tit=tmpfq.getTrace().iterator();tit.hasNext();)
+				for(Iterator<String> tit=tmpfq.getTrace().iterator();tit.hasNext();)// events from the trace of q
 				{
 					nf.getTrace().add((String)tit.next());
 				}
-				for(Iterator rit=tmpfq.getRefusal().iterator();rit.hasNext();)
+				for(Iterator<EventSet> rit=tmpfq.getRefusal().iterator();rit.hasNext();)//refusal is from the refusal of q
 				{
 					nf.getRefusal().add((EventSet)rit.next());
 				}
@@ -67,49 +66,34 @@ public class SequentialProcesses extends Process{ //build sequential processes
 			}
 		}
 		
-		this.failures=p.getFailures();
-		for(Iterator qit=exp.iterator();qit.hasNext();)
+		this.failures=p.getFailures();//add failures of p
+		for(Iterator<Failure> qit=exp.iterator();qit.hasNext();) //add failures of q
 		{
-			Failure tmpfq=(Failure)qit.next();
+			Failure tmpfq=qit.next();
 			this.failures.add(tmpfq);
 		}
-		q.getFailures().add(qnil);//for loopprocesses
+		q.getFailures().add(qnil);//add the previously removed empty trace
 	}
 	
 	public static void main(String args[])
 	{
 		
 		TransitionSystem ts1=new TransitionSystem();
-		ts1.add(new Transition(0,"coin1",1));
-		ts1.add(new Transition(1,"pepsi1",2));
-		ts1.add(new Transition(1,"coke1",3));
-		ts1.add(new Transition(1,"tea1",4));
+		ts1.add(new Transition(0,"coin",1));
+
 		
 		TransitionSystem ts2=new TransitionSystem();
-		ts2.add(new Transition(0,"coin",1));
-		ts2.add(new Transition(1,"pepsi",2));
-		ts2.add(new Transition(1,"coke",3));
-		//ts2.add(new Transition(1,"tea",4));
+		ts2.add(new Transition(0,"pepsi",1));
 		
-
+		TransitionSystem ts3=new TransitionSystem();
+		ts3.add(new Transition(0,"hotpepsi",1));
 		
 		Process vmi2=new Process(ts2);
 		Process vmi1=new Process(ts1);
-		//TraceSet set=Utilities.searchSuccessfulTraces(vmi1);
-		//for(Iterator it=set.iterator();it.hasNext();)
-		//{
-		//	System.out.println(it.next());
-		//}
-		
+		Process vmi3=new Process(ts3);
+
 		Process s=new SequentialProcesses(vmi1,vmi2);
-		
-		System.out.println(s.getAlphabet());
-		for(Iterator fit=s.getFailures().iterator();fit.hasNext();)
-		{
-			Failure f=(Failure)fit.next();
-			System.out.println("Trace "+f.getTrace());
-			System.out.println("Refusal"+f.getRefusal());
-			System.out.println();
-		}
+		s=new SequentialProcesses(s,vmi3);
+		Utilities.printProcess(s);
 	}
 }

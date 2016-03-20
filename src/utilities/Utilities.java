@@ -375,16 +375,14 @@ public class Utilities{
 	
 	public static void ExtendEventsToProcess(Process p,EventSet e) //when two process deterministic select, nondeterministic, execute sequentially, loop, the alphabet and refusals need to be extended
 	{
-		p.setAlphabet((EventSet) Utilities.union(p.getAlphabet(), e)); //extend alphabet first
+		EventSet newAlphabet= Utilities.union(p.getAlphabet(), e); //extend alphabet first
 		for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();)  //extend each failure
 		{
 			Failure tmpf=pit.next();
 			EventSet tmpp=Utilities.powerSetToSet(tmpf.getRefusal()); //get events in refusal
-			EventSet diff=Utilities.setDiff(tmpp, p.getAlphabet()); //find other events not in refusal but in alphabet
-			EventSet intec=Utilities.intersection(diff, e); //find out events not in refusal but in the alphabet and the set e
-			EventSet tmpq=Utilities.setDiff(e, intec); 
-			EventSet tmppq=Utilities.union(tmpp,tmpq);
-			Refusal tmpr=Utilities.powerSet(tmppq);
+			EventSet acceptEvts=Utilities.setDiff(tmpp, p.getAlphabet()); //find  events not in refusal but in alphabet
+			EventSet newRefusalEvts=Utilities.setDiff(acceptEvts, newAlphabet); //find out events in new refusal
+			Refusal tmpr=Utilities.powerSet(newRefusalEvts);
 			tmpr.remove(new EventSet());// remove empty set
 			Refusal rf=new Refusal();
 			for(Iterator<EventSet> nit=tmpr.iterator();nit.hasNext();)
@@ -393,10 +391,11 @@ public class Utilities{
 			}
 			tmpf.setRefusal(rf);
 		}
+		p.setAlphabet(newAlphabet);
 	}
 
 	
-	public static EventSet union(EventSet x, EventSet y) //union for EventSet
+	public static EventSet union(EventSet x, EventSet y) //union of EventSets
 	{
 		EventSet u = new EventSet();
 		  for(Iterator<String> j=x.iterator();j.hasNext();)
@@ -406,6 +405,29 @@ public class Utilities{
 		   for (Iterator<String> i= y.iterator(); i.hasNext(); )
 			   u.add(i.next());
 		   return u;
+	}
+	
+	public static Refusal union(Refusal x, Refusal y) // union of Refusals
+	{
+		Refusal r=new Refusal();
+		for(Iterator<EventSet> xit=x.iterator();xit.hasNext();)
+		{
+			r.add(xit.next());
+		}
+		
+		for(Iterator<EventSet> yit=y.iterator();yit.hasNext();)
+		{
+			boolean flag=false;
+			EventSet yevts=yit.next();
+			for(Iterator<EventSet> xit=x.iterator();xit.hasNext();)
+			{
+				if(Utilities.compareEventSets(xit.next(), yevts))
+					flag=true;
+			}
+			if(flag==false)
+				r.add(yevts);
+		}
+		return r;
 	}
 	
 	
@@ -600,15 +622,15 @@ public class Utilities{
 		}
 	}
 	
-	public static void extendFailures(Process p, EventSet events)// extend failures with events
-	{
-		p.setAlphabet((EventSet)Utilities.union(p.getAlphabet(),events));
-		for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
-		{
-			Failure f=it.next();
-			Refusal newEvents=new Refusal();
-		}
-	}
+//	public static void extendFailures(Process p, EventSet events)// extend failures with events
+//	{
+//		p.setAlphabet((EventSet)Utilities.union(p.getAlphabet(),events));
+//		for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
+//		{
+//			Failure f=it.next();
+//			Refusal newEvents=new Refusal();
+//		}
+//	}
 	
 	public static boolean compareEventSets(EventSet evts1, EventSet evts2)//compare EventSets
 	{
@@ -669,9 +691,9 @@ public class Utilities{
 	{
 		Failure failure2;
 		System.out.println("Alphabet: "+p.getAlphabet());
-		for(Iterator it=p.getFailures().iterator();it.hasNext();)
+		for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
 		{
-			failure2=(Failure)it.next();
+			failure2=it.next();
 			System.out.println("Trace: "+failure2.getTrace());
 			System.out.println("Refusal: "+Utilities.powerSetToSet(failure2.getRefusal()));
 		}

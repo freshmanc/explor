@@ -96,7 +96,58 @@ public class FilterProcessCategoryXML {
 	public static void main(String args[])
 	{
 
-		//transition system from design
+		//nondeterministic choices of C
+		TransitionSystem coinTC=new TransitionSystem();
+		coinTC.add(new Transition(0,"coin",1));
+		Process coinPC=new Process(coinTC);
+		
+		TransitionSystem coffeeTC=new TransitionSystem();
+		coffeeTC.add(new Transition(0,"coffee",1));
+		Process coffeePC=new Process(coffeeTC);
+		
+		TransitionSystem teaTC=new TransitionSystem();
+		teaTC.add(new Transition(0,"tea",1));
+		Process teaPC=new Process(teaTC);
+		
+		TransitionSystem refundTC=new TransitionSystem();
+		refundTC.add(new Transition(0,"refund",1));
+		Process refundPC=new Process(refundTC);
+		
+		Process PC=new NondeterministicChoice(teaPC,refundPC);
+		PC=new NondeterministicChoice(coffeePC,PC);
+		PC=new NondeterministicChoice(coinPC,PC);
+		Utilities.printProcess(PC);
+		
+		
+		//deterministic choices of V
+		TransitionSystem coinTV=new TransitionSystem();
+		coinTV.add(new Transition(0,"coin",1));
+		Process coinPV=new Process(coinTV);
+		
+		TransitionSystem coffeeTV=new TransitionSystem();
+		coffeeTV.add(new Transition(0,"coffee",1));
+		Process coffeePV=new Process(coffeeTV);
+		
+		TransitionSystem teaTV=new TransitionSystem();
+		teaTV.add(new Transition(0,"tea",1));
+		Process teaPV=new Process(teaTV);
+		
+		TransitionSystem refundTV=new TransitionSystem();
+		refundTV.add(new Transition(0,"refund",1));
+		Process refundPV=new Process(refundTV);
+		
+		Process PV=new DeterministicChoice(teaPV,refundPV);
+		PV=new DeterministicChoice(coffeePV,PV);
+		PV=new SequentialProcesses(coinPV,PV);
+		Utilities.printProcess(PV);
+		
+		
+		//communication between C and V
+		Process CcV=new Communication(PC,PV); //has problem
+		Utilities.printProcess(CcV);
+		
+		
+		
 		TransitionSystem dsgT=new TransitionSystem();
 		dsgT.add(new Transition(0,"coin",1));	
 		dsgT.add(new Transition(1,"tea",2));

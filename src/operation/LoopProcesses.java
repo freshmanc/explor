@@ -1,3 +1,4 @@
+//developer ming zhu
 package operation;
 
 import java.util.HashSet;
@@ -41,16 +42,7 @@ public class LoopProcesses extends Process{
 		ts2.add(new Transition(1,"coke",3));
 		
 		Process vmi2=new Process(ts2);
-		Process loop=new LoopProcesses(vmi2,4);
-		
-		System.out.println(loop.getAlphabet());
-		CategoryProcess cp=new CategoryProcess(loop);
-		Utilities.printCategory(cp.getInit(), 0);
-		//for(Iterator fit=loop.getFailures().iterator();fit.hasNext();)
-		//{
-		//	Failure f=(Failure)fit.next();
-		//	System.out.println("Trace "+f.getTrace());
-		//	System.out.println("Refusal"+f.getRefusal());
-		//}
+		Process loop=new LoopProcesses(vmi2,3);
+		Utilities.printProcess(loop);
 	}
 }
