@@ -117,7 +117,7 @@ public class FilterProcessCategoryXML {
 		PC=new NondeterministicChoice(coffeePC,PC);
 		PC=new NondeterministicChoice(coinPC,PC);
 		Utilities.printProcess(PC);
-		
+		System.out.println();
 		
 		//deterministic choices of V
 		TransitionSystem coinTV=new TransitionSystem();
@@ -140,12 +140,12 @@ public class FilterProcessCategoryXML {
 		PV=new DeterministicChoice(coffeePV,PV);
 		PV=new SequentialProcesses(coinPV,PV);
 		Utilities.printProcess(PV);
-		
+		System.out.println();
 		
 		//communication between C and V
-		Process CcV=new Communication(PC,PV); //has problem
+		Process CcV=new Communication(PV,PC); //has problems
 		Utilities.printProcess(CcV);
-		
+		System.out.println();
 		
 		
 		TransitionSystem dsgT=new TransitionSystem();

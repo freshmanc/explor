@@ -9,7 +9,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import structures.Object;
+import structures.ObjectProcess;
 import structures.Process;
 import structures.*;
 
@@ -504,7 +504,7 @@ public class Utilities{
 		return null;
 	}
 	
-	public static void printCategory(Object<Process> current, int level)
+	public static void printCategory(ObjectProcess current, int level)
 	{
 		System.out.println("Level "+level);
 		System.out.println("largest trace: "+current.getTrace());
@@ -515,9 +515,9 @@ public class Utilities{
 			System.out.println("Refusal: "+f.getRefusal());
 		}
 		System.out.println("-----------------");
-		for(Iterator<Object<Process>> xt=current.getChildren().iterator();xt.hasNext();)
+		for(Iterator<ObjectProcess> xt=current.getChildren().iterator();xt.hasNext();)
 		{
-			Object<Process> tmp=xt.next();
+			ObjectProcess tmp=xt.next();
 			printCategory(tmp,level+1);
 		}
 	}
@@ -645,13 +645,13 @@ public class Utilities{
 		Utilities.ObjectProcessToXML(cprocess, doc, cp.getInit());
 	}
 	
-	public static void ObjectProcessToXML(Element elm, Document doc, Object<Process> op)
+	public static void ObjectProcessToXML(Element elm, Document doc, ObjectProcess op)
 	{
 		Element obj=doc.createElement("object");
 		obj.setAttribute("name", op.getTrace().toString());
 		elm.appendChild(obj);
 		ProcessToXML(obj,doc,op.getData());
-		for(Iterator<Object<Process>> opcit=op.getChildren().iterator();opcit.hasNext();)
+		for(Iterator<ObjectProcess> opcit=op.getChildren().iterator();opcit.hasNext();)
 		{
 			ObjectProcessToXML(obj,doc,opcit.next());
 		}
