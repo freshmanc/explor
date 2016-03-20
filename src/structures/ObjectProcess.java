@@ -1,19 +1,20 @@
 package structures;
 import java.util.*;
 
-public class Object<T>{ 
+public class ObjectProcess{ 
 	
-		private T data;  //the data of the object
+		private Process data;  //the data of the object
 		private Trace trace; //longest trace of the object
 
-	    private List<Object<T>> children; //connected to next objects by morphisms
+	    private List<ObjectProcess> children; //connected to next objects by morphisms
 
-	    public Object(T process) {
-	        this.data = process;
-	        this.children = new ArrayList<Object<T>>();
+	    public ObjectProcess(Process data) {
+	        this.data = data;
+	        this.children = new ArrayList<ObjectProcess>();
 	    }
 	    
-	    
+	   
+
 		public Trace getTrace() {
 			return trace;
 		}
@@ -25,18 +26,18 @@ public class Object<T>{
 		}
 	    
 
-	    public Object<T> addChild(Object<T> child) {
+	    public ObjectProcess addChild(ObjectProcess child) {
 	    	//Object<T> childNode = new Object<T>(child);
 	        //child.parent = this;
 	        this.children.add(child);
 	        return child;
 	    }
 	    
-		public T getData() {
+		public Process getData() {
 			return data;
 		}
 
-		public void setData(T data) {
+		public void setData(Process data) {
 			this.data = data;
 		}
 
@@ -48,11 +49,11 @@ public class Object<T>{
 		//	this.parent = parent;
 		//}
 
-		public List<Object<T>> getChildren() {
+		public List<ObjectProcess> getChildren() {
 			return children;
 		}
 
-		public void setChildren(List<Object<T>> children) {
+		public void setChildren(List<ObjectProcess> children) {
 			this.children = children;
 		}
 }

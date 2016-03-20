@@ -3,7 +3,7 @@
 package structures;
 import java.util.*;
 
-import structures.Object;
+import structures.ObjectProcess;
 import structures.Process;
 import utilities.Utilities;
 

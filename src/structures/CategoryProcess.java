@@ -6,15 +6,29 @@ import java.util.*;
 import utilities.Utilities;
 
 
-public class CategoryProcess extends Category{ 
+public class CategoryProcess{ 
 	// a specific category, 
 	//each object represents a process
 	//each morphism represents the evolution from a process to another process
 
+	protected ObjectProcess init; 
+	
+	public ObjectProcess getInit() {
+		return init;
+	}
+
+	public void setInit(ObjectProcess init) {
+		this.init = init;
+	}
+
+	public CategoryProcess()
+	{
+		this.init=new ObjectProcess(new Process());
+	}
 
 	public CategoryProcess(Process orig) //construct category from process
 	{
-		init=new Object<Process>(new Process());// create the root object
+		init=new ObjectProcess(new Process());// create the root object
 		Trace trace=new Trace(); //start from empty trace
 		buildInitialObject(orig); //build the initial object
 		buildNextObjects(trace,init,orig); //build rest of objects from the initial object
@@ -37,7 +51,7 @@ public class CategoryProcess extends Category{
 		}		
 	}
 	
-	private void buildNextObjects(Trace trace, Object<Process> parent, Process orig)
+	private void buildNextObjects(Trace trace, ObjectProcess parent, Process orig)
 	{
 		for(Iterator<Failure> it=orig.getFailures().iterator();it.hasNext();)
 		{
@@ -50,7 +64,7 @@ public class CategoryProcess extends Category{
 				
 				tmpp.setFailures(parent.getData().getFailures());// failures of the previous process
 				tmpp.getFailures().add(tmpf);//new failure
-				Object<Process> child=new Object<Process>(tmpp);
+				ObjectProcess child=new ObjectProcess(tmpp);
 			
 				parent.addChild(child);
 				child.setTrace(tmpf.getTrace());

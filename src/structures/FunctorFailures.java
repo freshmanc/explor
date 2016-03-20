@@ -11,7 +11,7 @@ import vm.CategoryImplementVM;
 public class FunctorFailures extends HashMap<Trace, Trace>{ //save two categories and a functor between them to an xml file
 
 	
-	private boolean compareObjects(Object<Process> dsgObj,Object<Process> impObj)
+	private boolean compareObjects(ObjectProcess dsgObj,ObjectProcess impObj)
 	{
 		Process dsgData=dsgObj.getData();
 		Process impData=impObj.getData();
@@ -51,18 +51,18 @@ public class FunctorFailures extends HashMap<Trace, Trace>{ //save two categorie
 			return true;
 	}
 	
-	private boolean compareSubObjects(Object<Process> dsgObj,Object<Process> impObj)
+	private boolean compareSubObjects(ObjectProcess dsgObj,ObjectProcess impObj)
 	{
-		List<Object<Process>> dsgChildren=dsgObj.getChildren();
-		List<Object<Process>> impChildren=impObj.getChildren();
+		List<ObjectProcess> dsgChildren=dsgObj.getChildren();
+		List<ObjectProcess> impChildren=impObj.getChildren();
 		boolean flag;
-		Object<Process> dsgChd;
-		Object<Process> impChd;
-			for(Iterator<Object<Process>> dsgChdIt=dsgChildren.iterator();dsgChdIt.hasNext();)
+		ObjectProcess dsgChd;
+		ObjectProcess impChd;
+			for(Iterator<ObjectProcess> dsgChdIt=dsgChildren.iterator();dsgChdIt.hasNext();)
 			{
 				dsgChd=dsgChdIt.next();
 				flag=false;
-				for(Iterator<Object<Process>> impChdIt=impChildren.iterator();impChdIt.hasNext();)
+				for(Iterator<ObjectProcess> impChdIt=impChildren.iterator();impChdIt.hasNext();)
 				{
 					impChd=impChdIt.next();
 					if(compareObjects(dsgChd, impChd))
@@ -81,10 +81,10 @@ public class FunctorFailures extends HashMap<Trace, Trace>{ //save two categorie
 		return true;
 	}
 	
-	public  boolean compareCategories(Category dsgVM, Category impVM)
+	public  boolean compareCategories(CategoryProcess dsgVM, CategoryProcess impVM)
 	{
-		Object<Process> dsgInit=dsgVM.getInit();
-		Object<Process> impInit=impVM.getInit();
+		ObjectProcess dsgInit=dsgVM.getInit();
+		ObjectProcess impInit=impVM.getInit();
 		
 		if(compareObjects(dsgInit, impInit))
 		{
