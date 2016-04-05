@@ -1,0 +1,9 @@
+From:1 Label:# To:2
+From:1 Label:coin To:3
+From:5 Label:cappuccino To:1
+From:3 Label:coffee To:5
+From:5 Label:mocha To:1
+From:4 Label:red To:1
+From:4 Label:green To:1
+From:3 Label:tea To:4
+From:3 Label:refund To:1
