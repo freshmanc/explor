@@ -115,7 +115,7 @@ public class FilterProcessCategoryXML {
 		
 		Process PC=new NondeterministicChoice(teaPC,refundPC);
 		PC=new NondeterministicChoice(coffeePC,PC);
-		PC=new NondeterministicChoice(coinPC,PC);
+		PC=new DeterministicChoice(coinPC,PC);
 		Utilities.printProcess(PC);
 		System.out.println();
 		

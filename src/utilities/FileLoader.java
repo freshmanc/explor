@@ -60,31 +60,34 @@ public class FileLoader {
 	    
 	    public static void main(String args[]) throws FileNotFoundException
 	    {
-			PrintStream out = new PrintStream(new FileOutputStream("./output.txt"));
-			System.setOut(out);
+			//PrintStream out = new PrintStream(new FileOutputStream("./output.txt"));
+			//System.setOut(out);
 			
 			TransitionSystem impT1=new TransitionSystem();
-			impT1=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\dropbox\\Transitions\\vm-4_Customer.lts");
-			//Utilities.printTransitionSystem(impT1);
+			impT1=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\vm-4_Customer.dot");
+			Utilities.printTransitionSystem(impT1);
+			System.out.println();
 			impT1=Utilities.acyclicTransitionSystem(impT1);
+			Utilities.printTransitionSystem(impT1);
+			System.out.println();
 			impT1=Utilities.loopTransitionSystem(impT1, 2);
-			//Utilities.printTransitionSystem(impT1);
-			Process p=new Process(impT1);
-			//Utilities.printProcess(p);
-			FailureTree ftp=new FailureTree(p);
-//			//Utilities.printFailureTree(ftp);
-			EventSet newAlphabet=new EventSet();
-			newAlphabet.add("coin");
-			newAlphabet.add("tea");
-			newAlphabet.add("coffee");
-			newAlphabet.add("green");
-			newAlphabet.add("red");
-			newAlphabet.add("mocha");
-			newAlphabet.add("cappuccino");
-			ftp=new EquivalentFailureTree(ftp, newAlphabet);
-			Utilities.printFailureTree(ftp);
-			Utilities.printProcess(ftp.treeToProcess());
-			
+			Utilities.printTransitionSystem(impT1);
+//			Process p=new Process(impT1);
+//			//Utilities.printProcess(p);
+//			FailureTree ftp=new FailureTree(p);
+////			//Utilities.printFailureTree(ftp);
+//			EventSet newAlphabet=new EventSet();
+//			newAlphabet.add("coin");
+//			newAlphabet.add("tea");
+//			newAlphabet.add("coffee");
+//			newAlphabet.add("green");
+//			newAlphabet.add("red");
+//			newAlphabet.add("mocha");
+//			newAlphabet.add("cappuccino");
+//			ftp=new EquivalentFailureTree(ftp, newAlphabet);
+//			Utilities.printFailureTree(ftp);
+//			Utilities.printProcess(ftp.treeToProcess());
+//			
 //			TransitionSystem impT2=new TransitionSystem();
 //			impT2=FileLoader.fileToTransitionSystem("C:\\Users\\zhuming\\dropbox\\Transitions\\vm-4_VendingMachine.lts");
 //			//Utilities.printTransitionSystem(impT2);

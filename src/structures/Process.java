@@ -60,6 +60,8 @@ public class Process {
 	    EventSet psbEvt=new EventSet(); //set of possible next events
 		Failure failure=new Failure();
 		Refusal powerset;
+		boolean deterministic=false;
+		int i=0;
 		
 		for(Iterator<Transition> it=ts.iterator();it.hasNext();)//check each path in the transition system
 		{
@@ -67,17 +69,40 @@ public class Process {
 			if(tempTst.getFrom().equals(from))
 			{
 				Trace tmpTrace=new Trace(trace);
-				psbEvt.add(tempTst.getLabel()); 
-				tmpTrace.add(tempTst.getLabel());
+				if(tempTst.getLabel().contains("\'"))
+				{
+					deterministic= false; 
+					//System.out.println(tempTst.getLabel());
+					tmpTrace.add(tempTst.getLabel().substring(0, tempTst.getLabel().length()-1));
+					psbEvt.add(tempTst.getLabel().substring(0, tempTst.getLabel().length()-1)); 
+				}
+				else
+				{
+					deterministic=true;
+					tmpTrace.add(tempTst.getLabel());
+					psbEvt.add(tempTst.getLabel()); 
+				}
 				buildFailures(tempTst.getTo(),tmpTrace,ts);	
 			}
 		}
-
-		powerset=Utilities.powerSet(Utilities.setDiff(psbEvt,alphabet));//find refusal set
-		failure.setRefusal(powerset);
-		failure.getRefusal().remove(new EventSet()); //remove {} empty event set
-		failure.setTrace(trace);
-		failures.add(failure);
+		//System.out.println(deterministic);
+		if(deterministic==true)
+		{
+			powerset=Utilities.powerSet(Utilities.setDiff(psbEvt,alphabet));//find refusal set
+			failure.setRefusal(powerset);
+			failure.getRefusal().remove(new EventSet()); //remove {} empty event set
+			failure.setTrace(trace);
+			failures.add(failure);
+		}
+		else
+		{
+			//System.out.println(trace);
+			powerset=Utilities.powerSet(alphabet);//find refusal set
+			failure.setRefusal(powerset);
+			failure.getRefusal().remove(new EventSet()); //remove {} empty event set
+			failure.setTrace(trace);
+			failures.add(failure);		
+		}
 		
 		
 	}
@@ -91,7 +116,10 @@ public class Process {
 			temp=(Transition)it.next();
 			if(temp.getFrom().equals(from))
 			{
-				alphabet.add(temp.getLabel());
+				if(temp.getLabel().contains("\'"))
+					alphabet.add(temp.getLabel().substring(0, temp.getLabel().length()-1));
+				else
+					alphabet.add(temp.getLabel());
 				buildEventSet(temp.getTo(),ts);
 			}
 		}
@@ -104,9 +132,10 @@ public class Process {
 		
 		TransitionSystem ts1=new TransitionSystem();
 		ts1.add(new Transition("0","coin","1"));
-		ts1.add(new Transition("1","pepsi","2"));
-		ts1.add(new Transition("1","coke","3"));
-		ts1.add(new Transition("1","tea","6"));
+		ts1.add(new Transition("1","pepsi'","2"));
+		ts1.add(new Transition("1","coke'","3"));
+		ts1.add(new Transition("1","tea'","6"));
+		ts1.add(new Transition("2","another_pepsi","5"));
 		
 		
 		Process vmi1=new Process(ts1);
