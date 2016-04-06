@@ -517,7 +517,7 @@ public class Utilities{
 		}
 	}
 	
-	public static void filterCategoryTransition(EventSet evts, CategoryTransition ct)
+	public static void filterCategoryTransition(EventSet evts, CategoryTransition ct)//filter category transition by using the evts
 	{
 		 filterObjectState(evts,ct.getInit(),null,null);
 	}

@@ -18,32 +18,34 @@ public class NondeterministicChoice extends Process{
 	{
 		boolean flag=false;
 		this.alphabet=(EventSet)Utilities.union(p.getAlphabet(), q.getAlphabet());
-		Utilities.ExtendEventsToProcess(p, q.getAlphabet());
-		Utilities.ExtendEventsToProcess(q, p.getAlphabet());
 		
-		this.failures=p.getFailures();
-		for(Iterator<Failure> qit=q.getFailures().iterator();qit.hasNext();)//according to the definition of deterministic choice
+		Process pClone=new Process();
+		pClone.setAlphabet(p.getAlphabet());
+		pClone.setFailures(p.getFailures());
+		
+		Process qClone=new Process();
+		qClone.setAlphabet(q.getAlphabet());
+		qClone.setFailures(q.getFailures());
+		
+		Utilities.ExtendEventsToProcess(pClone, qClone.getAlphabet());
+		Utilities.ExtendEventsToProcess(qClone, pClone.getAlphabet());
+
+		Failure pnil=Utilities.searchFailureByTrace(new Trace(), pClone); //the failure with empty trace in pClone
+		Failure qnil=Utilities.searchFailureByTrace(new Trace(), qClone); //the failure with empty trace in qClone
+		 
+
+
+		pClone.getFailures().remove(pnil);//remove the failure with empty trace in pClone
+		qClone.getFailures().remove(qnil);//remove the failure with empty trace in qClone
+		
+		Failure nil=new Failure();//new failure with empty trace from failures with empty trace in pClone and qClone
+		nil.setRefusal(Utilities.union(qnil.getRefusal(),pnil.getRefusal()));
+		
+		this.setFailures(pClone.getFailures()); //new failures combine pClone and qClone
+		this.getFailures().add(nil);
+		for(Iterator<Failure> qit=qClone.getFailures().iterator();qit.hasNext();)
 		{
-			Failure fq=qit.next();
-			flag=false;
-			for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();)//check if there is a failure with the same trace
-			{
-				Failure fp=pit.next();
-				if(fq.getTrace().equals(fp.getTrace()))
-				{
-					for(Iterator<Failure> tit=this.getFailures().iterator();tit.hasNext();)// update the trace in the new failure as the union
-					{
-						Failure ft=tit.next();
-						if(ft.getTrace().equals(fq.getTrace()))
-						{
-							ft.setRefusal(Utilities.union(fp.getRefusal(), fq.getRefusal()));
-							flag=true;
-						}
-					}
-				}
-			}
-			if(flag==false)
-			this.failures.add(fq);
+			this.getFailures().add(qit.next());
 		}
 	}
 	
@@ -59,7 +61,12 @@ public class NondeterministicChoice extends Process{
 
 		
 		Process vmi2=new Process(ts2);
+		//Utilities.printProcess(vmi2);
+		//System.out.println();
+		
 		Process vmi1=new Process(ts1);
+		//Utilities.printProcess(vmi1);
+		//System.out.println();
 
 		Process s=new NondeterministicChoice(vmi1,vmi2);
 		Utilities.printProcess(s);

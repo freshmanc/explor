@@ -2,6 +2,7 @@ package structures;
 
 import java.util.Iterator;
 
+import operation.LoopProcesses;
 import utilities.DotLoader;
 import utilities.Utilities;
 
@@ -69,7 +70,7 @@ public class CategoryTransition {
 	
 	public static void main(String[] args)
 	{
-	   	TransitionSystem tsv=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\test-1_Customer.dot");
+	   	TransitionSystem tsv=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\test-1_VendingMachine.dot");
     	Utilities.printTransitionSystem(tsv);
     	tsv=Utilities.acyclicTransitionSystem(tsv);
     	System.out.println();
@@ -85,9 +86,9 @@ public class CategoryTransition {
     	Process p=new Process(ctv.toTransitionSystem());
     	System.out.println();
     	Utilities.printProcess(p);
-    	//Utilities.printTransitionSystem(ts);
-    	//Process pv=new Process(tsv);
-    	//Utilities.printProcess(pv);
-    	//System.out.println();
+    	System.out.println();
+    	p=new LoopProcesses(p,2);
+    	Utilities.printProcess(p);
+    	System.out.println();
 	}
 }

@@ -14,12 +14,25 @@ public class SequentialProcesses extends Process{ //build sequential processes
 	public SequentialProcesses(Process p,Process q)
 	{
 		this.alphabet=(EventSet) Utilities.union(p.getAlphabet(), q.getAlphabet());
-		Utilities.ExtendEventsToProcess(p, q.getAlphabet());
-		Utilities.ExtendEventsToProcess(q, p.getAlphabet());
-		HashSet<Trace> sucSet=Utilities.searchSuccessfulTraces(p); //find a set of largest traces
-		Failure qnil=null; //failure with empty trace
-		Failures exp=new Failures(); //failures of extended q 
-		for(Iterator<Failure> qit=q.getFailures().iterator();qit.hasNext();) // find the empty trace
+		
+		Process qClone=new Process();
+		qClone.setAlphabet(q.getAlphabet());
+		qClone.setFailures(q.getFailures());
+		
+		Process pClone=new Process();
+		pClone.setAlphabet(p.getAlphabet());
+		pClone.setFailures(p.getFailures());
+		
+		Utilities.ExtendEventsToProcess(pClone, qClone.getAlphabet());
+		Utilities.ExtendEventsToProcess(qClone, pClone.getAlphabet());
+
+		this.setFailures(pClone.getFailures());;//add failures of pClone
+		HashSet<Trace> sucSet=Utilities.searchSuccessfulTraces(this); //find a set of largest traces
+		
+		Failure qnil=null; //failure with empty trace in qClone
+		Failures exp=new Failures(); //failures of extended qClone 
+		
+		for(Iterator<Failure> qit=qClone.getFailures().iterator();qit.hasNext();) // find the empty trace
 		{
 			Failure tmpfq=qit.next();
 			if(tmpfq.getTrace().equals(new Trace()))
@@ -28,51 +41,51 @@ public class SequentialProcesses extends Process{ //build sequential processes
 			}
 		}
 		
-		for(Iterator<Trace> it=sucSet.iterator();it.hasNext();) // replace the refusal of each largest trace by using  the empty trace
+		for(Iterator<Trace> traceIt=sucSet.iterator();traceIt.hasNext();) // replace the refusal of each largest trace of pClone by using  refusal of the empty trace of q
 		{
-			Trace tmpt=it.next();
-			for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();) //find the failures of the largest trace
+			Trace tmpt=traceIt.next();
+			for(Iterator<Failure> thisIt=this.getFailures().iterator();thisIt.hasNext();) //find the failures of the largest trace
 			{
-				Failure tmpfp=(Failure)pit.next();
+				Failure tmpfp=(Failure)thisIt.next();
 				if(tmpfp.getTrace().equals(tmpt))
 				{
 					tmpfp.setRefusal(qnil.getRefusal());
 				}
 			}
 		}
-		q.getFailures().remove(qnil); //remove the empty trace from failure temporarily
 		
-		
-		for(Iterator<Trace> it=sucSet.iterator();it.hasNext();) //extend the each trace of q by useing each largest trace of p
+		qClone.getFailures().remove(qnil);//remove the empty trace from failure temporarily
+
+		for(Iterator<Trace> traceIt=sucSet.iterator();traceIt.hasNext();) //extend the each trace of q by useing each largest trace of p
 		{
-			Trace tmpts=(Trace)it.next();
-			for(Iterator<Failure> qit=q.getFailures().iterator();qit.hasNext();)
+			Trace tmpts=traceIt.next();
+			for(Iterator<Failure> qit=qClone.getFailures().iterator();qit.hasNext();)
 			{
 				Failure tmpfq=qit.next();
-				Failure nf=new Failure();//new failure to copy the failure in q
-				for(Iterator<String> sit=tmpts.iterator();sit.hasNext();) //events from the largest trace 
+				Failure nf=new Failure();//new failure to copy the failure in qCline
+				for(Iterator<String> sit=tmpts.iterator();sit.hasNext();) //events from the largest trace of pClone
 				{
-					nf.getTrace().add((String)sit.next());
+					nf.getTrace().add(sit.next());
 				}
-				for(Iterator<String> tit=tmpfq.getTrace().iterator();tit.hasNext();)// events from the trace of q
+				for(Iterator<String> tit=tmpfq.getTrace().iterator();tit.hasNext();)// events from the trace of qClone
 				{
-					nf.getTrace().add((String)tit.next());
+					nf.getTrace().add(tit.next());
 				}
-				for(Iterator<EventSet> rit=tmpfq.getRefusal().iterator();rit.hasNext();)//refusal is from the refusal of q
+				for(Iterator<EventSet> rit=tmpfq.getRefusal().iterator();rit.hasNext();)//refusal is from the refusal of qClone
 				{
-					nf.getRefusal().add((EventSet)rit.next());
+					nf.getRefusal().add(rit.next());
 				}
 				exp.add(nf);
 			}
 		}
-		
-		this.failures=p.getFailures();//add failures of p
-		for(Iterator<Failure> qit=exp.iterator();qit.hasNext();) //add failures of q
+	
+			
+		for(Iterator<Failure> qit=exp.iterator();qit.hasNext();) //add extended failures of qClone
 		{
 			Failure tmpfq=qit.next();
 			this.failures.add(tmpfq);
 		}
-		q.getFailures().add(qnil);//add the previously removed empty trace
+
 	}
 	
 	public static void main(String args[])

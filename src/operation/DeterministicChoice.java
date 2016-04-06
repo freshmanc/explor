@@ -21,47 +21,58 @@ public class DeterministicChoice extends Process{ //after the empty trace, the f
 	{
 		boolean flag=false;
 		this.alphabet=(EventSet)Utilities.union(p.getAlphabet(), q.getAlphabet()); //new alphabet
-		Utilities.ExtendEventsToProcess(p, q.getAlphabet());
-		Utilities.ExtendEventsToProcess(q, p.getAlphabet());
+		Process pClone=new Process();
+		pClone.setAlphabet(p.getAlphabet());
+		pClone.setFailures(p.getFailures());
 		
+		Process qClone=new Process();
+		qClone.setAlphabet(q.getAlphabet());
+		qClone.setFailures(q.getFailures());
+
+		Utilities.ExtendEventsToProcess(pClone, qClone.getAlphabet());
+		Utilities.ExtendEventsToProcess(qClone, pClone.getAlphabet());
 		
-		Failure epf=Utilities.searchFailureByTrace(new Trace(), p);
-		Failure eqf=Utilities.searchFailureByTrace(new Trace(), q);
+		Failure epf=Utilities.searchFailureByTrace(new Trace(), pClone);
+		Failure eqf=Utilities.searchFailureByTrace(new Trace(), qClone);
 		Refusal refusal=Utilities.intersection(epf.getRefusal(), eqf.getRefusal());//new refusal of the empty trace
 		
-		this.getFailures().add(new Failure(new Trace(),refusal));//generate the failure with empty trace
-		p.getFailures().remove(epf);//temporarily remove the failure with empty trace from p
-		q.getFailures().remove(eqf);//temporarily remove the failure with empty trace from q
+		Failure nil=new Failure(new Trace(),refusal);
 		
-		this.failures.addAll(p.getFailures()); //add p into new process
 		
-		for(Iterator<Failure> qit=q.getFailures().iterator();qit.hasNext();)//according to the definition of deterministic choice
+		pClone.getFailures().remove(epf);//temporarily remove the failure with empty trace from p
+		qClone.getFailures().remove(eqf);//temporarily remove the failure with empty trace from q
+		
+		
+		this.setFailures(pClone.getFailures()); //add failures of pClone without epf
+		this.getFailures().add(nil);//add the failure with empty trace
+		for(Iterator<Failure> qit=qClone.getFailures().iterator();qit.hasNext();)//add failures of qClone without eqf
 		{
-			Failure fq=qit.next();
-			flag=false;
-			for(Iterator<Failure> pit=p.getFailures().iterator();pit.hasNext();)//check if there is a failure with the same trace
-			{
-				Failure fp=pit.next();
-				if(fq.getTrace().equals(fp.getTrace()))
-				{
-					for(Iterator<Failure> tit=this.getFailures().iterator();tit.hasNext();)// update the trace in the new failure as the union
-					{
-						Failure ft=tit.next();
-						if(ft.getTrace().equals(fq.getTrace()))
-						{
-							ft.setRefusal(Utilities.union(fp.getRefusal(), fq.getRefusal()));
-							flag=true;
-						}
-					}
-				}
-			}
-			if(flag==false)
-			this.failures.add(fq);
+			this.getFailures().add(qit.next());
 		}
 		
-		p.getFailures().add(epf);//add the failure with empty trace back to p
-		q.getFailures().add(eqf);//add the failrue with empty trace back to q
-		
+//		for(Iterator<Failure> qit=qClone.getFailures().iterator();qit.hasNext();)//according to the definition of deterministic choice
+//		{
+//			Failure fq=qit.next();
+//			flag=false;
+//			for(Iterator<Failure> pit=pClone.getFailures().iterator();pit.hasNext();)//check if there is a failure with the same trace
+//			{
+//				Failure fp=pit.next();
+//				if(fq.getTrace().equals(fp.getTrace()))
+//				{
+//					for(Iterator<Failure> tit=this.getFailures().iterator();tit.hasNext();)// update the trace in the new failure as the union
+//					{
+//						Failure ft=tit.next();
+//						if(ft.getTrace().equals(fq.getTrace()))
+//						{
+//							ft.setRefusal(Utilities.union(fp.getRefusal(), fq.getRefusal()));
+//							flag=true;
+//						}
+//					}
+//				}
+//			}
+//			if(flag==false)
+//			this.failures.add(fq);
+//		}		
 	}
 	
 	public static void main(String args[])
