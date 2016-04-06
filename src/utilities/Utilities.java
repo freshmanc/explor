@@ -9,7 +9,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import structures.ObjectProcess;
 import structures.Process;
 import structures.*;
 
@@ -502,6 +501,74 @@ public class Utilities{
 			}
 		}
 		return null;
+	}
+	
+	
+	private static void printObjectState(ObjectState current, int level)
+	{
+		System.out.println("Level "+level);
+		System.out.println("State "+ current.getState());
+		System.out.println("Label "+ current.getLabelToState());
+		System.out.println("-----------------");
+		for(Iterator<ObjectState> xt=current.getChildren().iterator();xt.hasNext();)
+		{
+			ObjectState tmp=xt.next();
+			printObjectState(tmp,level+1);
+		}
+	}
+	
+	public static void filterCategoryTransition(EventSet evts, CategoryTransition ct)
+	{
+		 filterObjectState(evts,ct.getInit(),null,null);
+	}
+	
+	private static void filterObjectState(EventSet evts, ObjectState os, ListIterator<ObjectState> lit, List<ObjectState> list)//remove events in evts from all children of os
+	//because Iterator cannot be modified by using add or remove, ListIterator is used , and lit is used to track the position of ListIterator
+	{
+		if(list!=null)// list is used to denote the children of a objectstate which has been removed. the objectstate contains the event in evts
+		{
+			for(ListIterator<ObjectState> it=list.listIterator();it.hasNext();) 
+			{
+				ObjectState tmpOs=it.next();
+				if(evts.contains(tmpOs.getLabelToState()))
+				{
+					it.remove();
+					if(tmpOs.getChildren().isEmpty()!=false) //use the children to replace the objeststate which contains the events in evts
+					{
+						for(ListIterator<ObjectState> tmpIt=tmpOs.getChildren().listIterator();tmpIt.hasNext();)
+							lit.add(tmpIt.next());
+						filterObjectState(evts,os,lit,tmpOs.getChildren());// deep first search
+					}
+				}
+				else
+					filterObjectState(evts,tmpOs,null,null);
+			}
+		}
+		else
+		{
+			for(ListIterator<ObjectState> it=os.getChildren().listIterator();it.hasNext();)
+			{
+				ObjectState tmpOs=it.next();
+				if(evts.contains(tmpOs.getLabelToState()))
+				{
+					it.remove();
+					if(tmpOs.getChildren().isEmpty()!=false)
+					{
+						for(ListIterator<ObjectState> tmpIt=tmpOs.getChildren().listIterator();tmpIt.hasNext();)
+							it.add(tmpIt.next());
+						filterObjectState(evts,os,it,tmpOs.getChildren());
+					}
+				}
+				else
+					filterObjectState(evts,tmpOs,null,null);
+			}
+		}
+	}
+	
+	
+	public static void printCategoryTransition(CategoryTransition ct)
+	{
+		printObjectState(ct.getInit(),0);
 	}
 	
 	public static void printCategory(ObjectProcess current, int level)

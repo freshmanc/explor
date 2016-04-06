@@ -12,7 +12,7 @@ public class Process {
 	}
 
 	public void setAlphabet(EventSet alphabet) {
-		for(Iterator it=alphabet.iterator();it.hasNext();)
+		for(Iterator<String> it=alphabet.iterator();it.hasNext();)
 		{
 			String tmp=new String((String)it.next()); //create a new string
 			this.alphabet.add(tmp);
@@ -61,31 +61,48 @@ public class Process {
 		Failure failure=new Failure();
 		Refusal powerset;
 		boolean deterministic=false;
-		int i=0;
+
+		TransitionSystem tmpTs=Utilities.nextImmediateTransitions(ts, from);
 		
-		for(Iterator<Transition> it=ts.iterator();it.hasNext();)//check each path in the transition system
+		if(tmpTs.size()<=0)
+		{}
+		if(tmpTs.size()==1)
 		{
-			tempTst=it.next();
-			if(tempTst.getFrom().equals(from))
+			deterministic=true;
+			Trace tmpTrace=new Trace(trace);
+			tempTst=tmpTs.iterator().next();
+
+			tmpTrace.add(tempTst.getLabel());
+			psbEvt.add(tempTst.getLabel()); 
+			
+			buildFailures(tempTst.getTo(),tmpTrace,ts);	
+		}
+		else
+		{
+			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)//check each path in the transition system
 			{
-				Trace tmpTrace=new Trace(trace);
-				if(tempTst.getLabel().contains("\'"))
+				tempTst=it.next();
+				if(tempTst.getFrom().equals(from))
 				{
-					deterministic= false; 
-					//System.out.println(tempTst.getLabel());
-					tmpTrace.add(tempTst.getLabel().substring(0, tempTst.getLabel().length()-1));
-					psbEvt.add(tempTst.getLabel().substring(0, tempTst.getLabel().length()-1)); 
+					Trace tmpTrace=new Trace(trace);
+					if(tempTst.getLabel().contains("\'")==false)
+					{
+						deterministic=false; 
+						tmpTrace.add(tempTst.getLabel());
+						psbEvt.add(tempTst.getLabel()); 
+					}
+					else
+					{
+						deterministic=true;
+						tmpTrace.add(tempTst.getLabel().substring(0, tempTst.getLabel().length()-1));
+						psbEvt.add(tempTst.getLabel().substring(0, tempTst.getLabel().length()-1)); 
+					}
+					buildFailures(tempTst.getTo(),tmpTrace,ts);	
 				}
-				else
-				{
-					deterministic=true;
-					tmpTrace.add(tempTst.getLabel());
-					psbEvt.add(tempTst.getLabel()); 
-				}
-				buildFailures(tempTst.getTo(),tmpTrace,ts);	
 			}
 		}
-		//System.out.println(deterministic);
+		
+
 		if(deterministic==true)
 		{
 			powerset=Utilities.powerSet(Utilities.setDiff(psbEvt,alphabet));//find refusal set
@@ -96,7 +113,6 @@ public class Process {
 		}
 		else
 		{
-			//System.out.println(trace);
 			powerset=Utilities.powerSet(alphabet);//find refusal set
 			failure.setRefusal(powerset);
 			failure.getRefusal().remove(new EventSet()); //remove {} empty event set
@@ -135,7 +151,7 @@ public class Process {
 		ts1.add(new Transition("1","pepsi'","2"));
 		ts1.add(new Transition("1","coke'","3"));
 		ts1.add(new Transition("1","tea'","6"));
-		ts1.add(new Transition("2","another_pepsi","5"));
+		//ts1.add(new Transition("2","another_pepsi","5"));
 		
 		
 		Process vmi1=new Process(ts1);
