@@ -56,10 +56,11 @@ public class EquivalentFailureTree extends FailureTree{
 		
 		Refusal pwtevts=Utilities.powerSet(evts); 
 		pwtevts.remove(new EventSet());
-		for(Iterator<EventSet> it=pwtevts.iterator();it.hasNext();) //refusal is initialized as powerset of evts
-		{
-			node.getData().getRefusal().add(it.next());
-		}
+		node.getData().setRefusal(pwtevts);
+//		for(Iterator<EventSet> it=pwtevts.iterator();it.hasNext();) //refusal is initialized as powerset of evts
+//		{
+//			node.getData().getRefusal().add(it.next());
+//		}
 		
 		Pair pair=Utilities.findEquivalentFailureTreeNode(ftn, evts); 
 		

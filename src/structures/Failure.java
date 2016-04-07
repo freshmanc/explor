@@ -27,7 +27,14 @@ public class Failure {
 		Refusal r=new Refusal();
 		for(Iterator<EventSet> it=refusal.iterator();it.hasNext();)
 		{
-			r.add(it.next());
+			EventSet tmp=it.next();
+			EventSet eTmp=new EventSet();
+			for(Iterator<String> eit=tmp.iterator();eit.hasNext();)
+			{
+				String sTmp=eit.next();
+				eTmp.add(sTmp);
+			}
+			r.add(eTmp);
 		}
 		this.refusal = r;
 	}

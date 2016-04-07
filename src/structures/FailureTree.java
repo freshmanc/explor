@@ -67,19 +67,17 @@ public class FailureTree { //make the process as a tree, each node contains a tr
 	private void buildSubTree(Failure failure, FailureTreeNode node, Process p) 
 	{
 		EventSet refusalEvents=Utilities.powerSetToSet(failure.getRefusal());
-		if(Utilities.compareEventSets(refusalEvents,p.getAlphabet())==false)//if the node has successors, the refusal will be not equal to the alphabet
+		//if(Utilities.compareEventSets(refusalEvents,p.getAlphabet())==false)//if the node has successors, the refusal will be not equal to the alphabet
+		for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
 		{
-			for(Iterator<Failure> it=p.getFailures().iterator();it.hasNext();)
+			Failure tmpf=(Failure)it.next();
+			
+			if(Utilities.subTrace(failure.getTrace(),tmpf.getTrace()) && (failure.getTrace().size()+1)==tmpf.getTrace().size())
 			{
-				Failure tmpf=(Failure)it.next();
-				
-				if(Utilities.subTrace(failure.getTrace(),tmpf.getTrace()) && (failure.getTrace().size()+1)==tmpf.getTrace().size())
-				{
-					FailureTreeNode child=new FailureTreeNode(tmpf);
-					//child.setParent(node);
-					node.addChild(child);
-					buildSubTree(tmpf,child, p);
-				}
+				FailureTreeNode child=new FailureTreeNode(tmpf);
+				//child.setParent(node);
+				node.addChild(child);
+				buildSubTree(tmpf,child, p);
 			}
 		}
 	}

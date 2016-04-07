@@ -63,6 +63,8 @@ public class Process {
 		boolean deterministic=false;
 
 		TransitionSystem tmpTs=Utilities.nextImmediateTransitions(ts, from);
+		//Utilities.printTransitionSystem(tmpTs);
+		//System.out.println();
 		
 		if(tmpTs.size()<=0)
 		{}

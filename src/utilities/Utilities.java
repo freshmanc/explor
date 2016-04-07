@@ -777,7 +777,7 @@ public class Utilities{
 		System.out.println("Alphabet: "+ft.getAlphabet());
 		System.out.println("Level "+level);
 		System.out.println("Trace: "+ ft.getRoot().getData().getTrace());
-		System.out.println("Refusal: "+ft.getRoot().getData().getRefusal());//Utilities.powerSetToSet(ft.getRoot().getData().getRefusal()));
+		System.out.println("Refusal: "+Utilities.powerSetToSet(ft.getRoot().getData().getRefusal()));//Utilities.powerSetToSet(ft.getRoot().getData().getRefusal()));
 	}
 	
 	private static void printFailureTreeChildren(FailureTreeNode node, int level)
@@ -787,7 +787,7 @@ public class Utilities{
 			FailureTreeNode ftn=it.next();
 			System.out.println("Level "+level);
 			System.out.println("Trace: "+ ftn.getData().getTrace());
-			System.out.println("Refusal: "+ftn.getData().getRefusal());//Utilities.powerSetToSet(ftn.getData().getRefusal()));
+			System.out.println("Refusal: "+Utilities.powerSetToSet(ftn.getData().getRefusal()));//Utilities.powerSetToSet(ftn.getData().getRefusal()));
 			Utilities.printFailureTreeChildren(ftn, level+1);
 		}
 	}
