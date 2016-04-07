@@ -23,7 +23,7 @@ public class CategoryTransition {
 		this.init=new ObjectState();
 	}
 	
-	CategoryTransition(TransitionSystem ts)
+	public CategoryTransition(TransitionSystem ts)
 	{
 		this.init=new ObjectState();
 		buildInitialState(ts);
