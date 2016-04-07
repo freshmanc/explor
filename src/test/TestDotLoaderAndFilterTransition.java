@@ -19,7 +19,7 @@ public class TestDotLoaderAndFilterTransition {
     	Utilities.printProcess(pv);
     	System.out.println();
     	
-    	TransitionSystem tsc=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\vm-4_Customer.dot");
+    	TransitionSystem tsc=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\vm-4_VendingMachine.dot");
     	//Utilities.printTransitionSystem(ts);
     	tsc=Utilities.acyclicTransitionSystem(tsc);
     	CategoryTransition ct=new CategoryTransition(tsc);
