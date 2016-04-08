@@ -1,0 +1,230 @@
+file "prelude"
+line LW390
+lbl LA1484
+rtn "kbdch"
+ext "C" "kbdch"
+end
+line LW391
+lbl LA1489
+rtn "scrch"
+ext "C" "scrch"
+end
+line LW393
+lbl LA1494
+rtn "kbdln"
+ext "C" "kbdln"
+end
+line LW394
+lbl LA1499
+rtn "scrln"
+ext "C" "scrln"
+end
+line LW402
+lbl LA1510
+rtn "open"
+ext "C" "open"
+end
+line LW403
+lbl LA1515
+rtn "close"
+ext "C" "close"
+end
+line LW404
+lbl LA1523
+rtn "state"
+ext "C" "state"
+end
+line LW405
+lbl LA1531
+rtn "eof"
+ext "C" "eof"
+end
+line LW406
+lbl LA1539
+rtn "read"
+ext "C" "read"
+end
+line LW407
+lbl LA1547
+rtn "write"
+ext "C" "write"
+end
+line LW414
+lbl LA1555
+rtn "abs"
+ext "C" "abs_real"
+end
+line LW415
+lbl LA1563
+rtn "abs"
+ext "C" "abs_word"
+end
+line LW416
+lbl LA1571
+rtn "sqrt"
+ext "C" "sqrt_real"
+end
+line LW417
+lbl LA1579
+rtn "exp"
+ext "C" "exp_real"
+end
+line LW418
+lbl LA1587
+rtn "log"
+ext "C" "log_real"
+end
+line LW419
+lbl LA1595
+rtn "sin"
+ext "C" "sin_real"
+end
+line LW420
+lbl LA1603
+rtn "cos"
+ext "C" "cos_real"
+end
+line LW421
+lbl LA1611
+rtn "tan"
+ext "C" "tan_real"
+end
+line LW422
+lbl LA1619
+rtn "atan"
+ext "C" "atan_real"
+end
+line LW423
+lbl LA1629
+rtn "atan2"
+ext "C" "atan2_real_real"
+end
+line LW432
+lbl LA1637
+rtn "rand"
+ext "C" "rand_word"
+end
+line LW437
+lbl LA1645
+rtn "rand"
+ext "C" "rand_real"
+end
+line LW442
+lbl LA1650
+rtn "rand"
+ext "C" "rand_unit"
+end
+line LW447
+lbl LA1655
+rtn "seed"
+ext "C" "rand_seed"
+end
+file "test-1.tex"
+line LW4
+lbl LA1737
+prc "VendingMachine"
+chn UP1708 LW5 "p"
+  fld LW0 "coin"
+  fld LW1 "refund"
+  fld LW2 "tea"
+  fld LW3 "coffee"
+  fld LW4 "stop"
+blk
+tmp GW2021
+tmp GW2046
+tmp GW2048
+tmp GB2063
+tmp GB2075
+tmp GB2087
+edec
+cpy GW2021 LW0
+line LW7
+lbl LA2027
+rsig UP1708 LW0
+line LW8
+cpy GW2046 LW2
+cpy GW2048 GW2046
+lbl LA2041
+add GW2046 GW2046 LW1
+rem GW2046 GW2046 LW3
+jtb GW2046 LA2043 LA2044 LA2045
+line LW10
+lbl LA2043
+nrqy GB2063 UP1708 LW1
+jf LA2036 GB2063
+line LW10
+rsig UP1708 LW1
+ja LA2037
+lbl LA2044
+nrqy GB2075 UP1708 LW3
+jf LA2036 GB2075
+line LW11
+rsig UP1708 LW3
+ja LA2037
+lbl LA2045
+nrqy GB2087 UP1708 LW2
+jf LA2036 GB2087
+line LW12
+rsig UP1708 LW2
+ja LA2037
+lbl LA2036
+jne LA2041 GW2046 GW2048
+wait
+ja LA2041
+lbl LA2037
+cpy GW2021 GW2046
+ja LA2027
+eblk
+end
+line LW18
+lbl LA1768
+prc "Customer"
+chn UP1742 LW5 "p"
+  fld LW0 "coin"
+  fld LW1 "refund"
+  fld LW2 "tea"
+  fld LW3 "coffee"
+  fld LW4 "stop"
+blk
+edec
+line LW20
+ssig UP1742 LW0
+line LW22
+ssig UP1742 LW2
+eblk
+end
+line LW28
+lbl LA1781
+cell "Main"
+blk
+edec
+blk
+crtp UP1773 LW5 "p"
+  fld LW0 "coin"
+  fld LW1 "refund"
+  fld LW2 "tea"
+  fld LW3 "coffee"
+  fld LW4 "stop"
+edec
+line LW31
+argb LW1 LW0
+put UP1773 LW0
+crtx LA1737 "VendingMachine" LW1
+arge
+line LW32
+argb LW1 LW0
+put UP1773 LW0
+crtx LA1768 "Customer" LW1
+arge
+eblk
+eblk
+end
+line LW35
+entr
+blk
+edec
+argb LW0 LW0
+crtc LA1781 "Main" LW0
+arge
+eblk
+end

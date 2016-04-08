@@ -1,0 +1,236 @@
+file "prelude"
+line LW390
+lbl LA1484
+rtn "kbdch"
+ext "C" "kbdch"
+end
+line LW391
+lbl LA1489
+rtn "scrch"
+ext "C" "scrch"
+end
+line LW393
+lbl LA1494
+rtn "kbdln"
+ext "C" "kbdln"
+end
+line LW394
+lbl LA1499
+rtn "scrln"
+ext "C" "scrln"
+end
+line LW402
+lbl LA1510
+rtn "open"
+ext "C" "open"
+end
+line LW403
+lbl LA1515
+rtn "close"
+ext "C" "close"
+end
+line LW404
+lbl LA1523
+rtn "state"
+ext "C" "state"
+end
+line LW405
+lbl LA1531
+rtn "eof"
+ext "C" "eof"
+end
+line LW406
+lbl LA1539
+rtn "read"
+ext "C" "read"
+end
+line LW407
+lbl LA1547
+rtn "write"
+ext "C" "write"
+end
+line LW414
+lbl LA1555
+rtn "abs"
+ext "C" "abs_real"
+end
+line LW415
+lbl LA1563
+rtn "abs"
+ext "C" "abs_word"
+end
+line LW416
+lbl LA1571
+rtn "sqrt"
+ext "C" "sqrt_real"
+end
+line LW417
+lbl LA1579
+rtn "exp"
+ext "C" "exp_real"
+end
+line LW418
+lbl LA1587
+rtn "log"
+ext "C" "log_real"
+end
+line LW419
+lbl LA1595
+rtn "sin"
+ext "C" "sin_real"
+end
+line LW420
+lbl LA1603
+rtn "cos"
+ext "C" "cos_real"
+end
+line LW421
+lbl LA1611
+rtn "tan"
+ext "C" "tan_real"
+end
+line LW422
+lbl LA1619
+rtn "atan"
+ext "C" "atan_real"
+end
+line LW423
+lbl LA1629
+rtn "atan2"
+ext "C" "atan2_real_real"
+end
+line LW432
+lbl LA1637
+rtn "rand"
+ext "C" "rand_word"
+end
+line LW437
+lbl LA1645
+rtn "rand"
+ext "C" "rand_real"
+end
+line LW442
+lbl LA1650
+rtn "rand"
+ext "C" "rand_unit"
+end
+line LW447
+lbl LA1655
+rtn "seed"
+ext "C" "rand_seed"
+end
+file "vm-1.tex"
+line LW5
+lbl LA1737
+prc "VendingMachine"
+chn UP1707 LW4 "+p"
+  fld LW0 "coke"
+  fld LW1 "pepsi"
+  fld LW2 "tea"
+  fld LW3 "stop"
+blk
+tmp GW2010
+tmp GW2028
+tmp GW2030
+tmp GB2045
+tmp GB2057
+tmp GB2069
+tmp GB2081
+edcl
+cpy GW2010 LW0
+line LW7
+lbl LA2016
+cpy GW2028 LW3
+cpy GW2030 GW2028
+lbl LA2022
+add GW2028 GW2028 LW1
+rem GW2028 GW2028 LW4
+jtb GW2028 LA2024 LA2025 LA2026 LA2027
+line LW9
+lbl LA2024
+nrqy GB2045 UP1707 LW0
+jf LA2017 GB2045
+line LW9
+rsig UP1707 LW0
+ja LA2018
+lbl LA2025
+nrqy GB2057 UP1707 LW1
+jf LA2017 GB2057
+line LW10
+rsig UP1707 LW1
+ja LA2018
+lbl LA2026
+nrqy GB2069 UP1707 LW2
+jf LA2017 GB2069
+line LW11
+rsig UP1707 LW2
+ja LA2018
+lbl LA2027
+nrqy GB2081 UP1707 LW3
+jf LA2017 GB2081
+line LW12
+rsig UP1707 LW3
+line LW12
+ja LA2023
+lbl LA2017
+jne LA2022 GW2028 GW2030
+wait
+ja LA2022
+lbl LA2018
+cpy GW2010 GW2028
+ja LA2016
+lbl LA2023
+eblk
+end
+line LW16
+lbl LA1756
+prc "Customer"
+chn UP1742 LW4 "-p"
+  fld LW0 "coke"
+  fld LW1 "pepsi"
+  fld LW2 "tea"
+  fld LW3 "stop"
+blk
+edcl
+line LW18
+ssig UP1742 LW1
+line LW19
+ssig UP1742 LW0
+line LW20
+ssig UP1742 LW3
+eblk
+end
+line LW23
+lbl LA1769
+cell "Main"
+blk
+edcl
+blk
+crtp UP1761 LW4 "p"
+  fld LW0 "coke"
+  fld LW1 "pepsi"
+  fld LW2 "tea"
+  fld LW3 "stop"
+edcl
+line LW26
+argb LW1 LW0
+put UP1761 LW0
+crtx LA1737 "VendingMachine" LW1
+arge
+line LW27
+argb LW1 LW0
+put UP1761 LW0
+crtx LA1756 "Customer" LW1
+arge
+eblk
+eblk
+end
+line LW30
+entr
+blk
+edcl
+argb LW0 LW0
+crtc LA1769 "Main" LW0
+arge
+eblk
+end

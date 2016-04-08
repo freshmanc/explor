@@ -1,0 +1,34 @@
+Drinks = protocol { coin; (refund|tea | coffee); stop }
+
+VendingMachine = process p: +Drinks
+{
+    loop{
+        p.coin;
+        select
+	    {
+          || p.refund
+          || p.coffee
+		  || p.tea
+	   }
+    }
+
+}
+
+Customer = process p: -Drinks
+{
+        p.coin;
+        case{
+            ||p.tea
+            ||p.coffee
+	        ||p.refund
+            }
+}
+
+Main = cell
+{	
+	p: Channel Drinks
+	VendingMachine(p)
+	Customer(p)
+}
+
+Main()
