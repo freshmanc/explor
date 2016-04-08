@@ -1,6 +1,7 @@
 package test;
 
 import operation.Communication;
+import operation.LoopProcesses;
 import structures.CategoryTransition;
 import structures.EventSet;
 import structures.Process;
@@ -16,10 +17,11 @@ public class TestDotLoaderAndFilterTransition {
     	tsv=Utilities.acyclicTransitionSystem(tsv);
     	//Utilities.printTransitionSystem(ts);
     	Process pv=new Process(tsv);
+    	pv=new LoopProcesses(pv,2);
     	Utilities.printProcess(pv);
     	System.out.println();
     	
-    	TransitionSystem tsc=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\vm-4_VendingMachine.dot");
+    	TransitionSystem tsc=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\vm-4_Customer.dot");
     	//Utilities.printTransitionSystem(ts);
     	tsc=Utilities.acyclicTransitionSystem(tsc);
     	CategoryTransition ct=new CategoryTransition(tsc);
@@ -28,6 +30,7 @@ public class TestDotLoaderAndFilterTransition {
     	Utilities.filterCategoryTransition(filterEvents, ct);
     	//Utilities.printTransitionSystem(ts);
     	Process pc=new Process(ct.toTransitionSystem());
+    	pc=new LoopProcesses(pc,2);
     	Utilities.printProcess(pc);
     	System.out.println();
     	

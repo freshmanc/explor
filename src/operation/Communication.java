@@ -100,27 +100,5 @@ public class Communication extends Process{
 		}
 	}
 	
-	public static void main(String args[])
-	{
-		TransitionSystem ts2=new TransitionSystem();
-		ts2.add(new Transition(0,"coin",1));
-		ts2.add(new Transition(1,"pepsi'",2));
-		ts2.add(new Transition(1,"coke'",3));
-		//ts2.add(new Transition(1,"tea",4));
-		
-		TransitionSystem ts1=new TransitionSystem();
-		ts1.add(new Transition(0,"coin",1));
-		ts1.add(new Transition(1,"pepsi'",2));
-		ts1.add(new Transition(1,"coke1'",3));
-		//ts1.add(new Transition(1,"tea",4));
-		
-		Process vmi2=new Process(ts2);
-		//Utilities.printProcess(vmi2);
-		Process vmi1=new Process(ts1);
-		
-		Process c=new Communication(vmi1,vmi2);
-		Utilities.printProcess(c);
-		//CategoryProcess cp= new CategoryProcess(c);
-		//Utilities.printCategory(cp.getInit(), 0);
-		}
+
 }
