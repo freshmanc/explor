@@ -552,7 +552,7 @@ public class Utilities{
 				if(evts.contains(tmpOs.getLabelToState()))
 				{
 					it.remove();
-					if(tmpOs.getChildren().isEmpty()!=false)
+					if(tmpOs.getChildren().size()>0)
 					{
 						for(ListIterator<ObjectState> tmpIt=tmpOs.getChildren().listIterator();tmpIt.hasNext();)
 							it.add(tmpIt.next());
