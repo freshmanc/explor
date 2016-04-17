@@ -184,34 +184,7 @@ public class Utilities{
 		return nf;
 	}
 	
-	private static boolean addTransitionWillCreateLoop(TransitionSystem ts, Transition t) //check if there are any transitions from "state" back to "state"
-	{
-		TransitionSystem nts=new TransitionSystem();
-		nts.addAll(ts);
-		nts.add(t);
-		String state=t.getFrom();
-		
-		LinkedList<String> queue=new LinkedList<String>(); //a set of states that have not been visited
-		queue.add(state);
-		TransitionSystem tmpTs;
-		while(queue.isEmpty()!=true)
-		{
-			tmpTs=Utilities.nextImmediateTransitions(nts, queue.removeFirst());
-			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
-			{
-				Transition tmpT=it.next();
-				if(tmpT.getTo().equals(state)) //from state to state, a loop
-				{
-					return true;
-				}
-				else
-				{
-					queue.add(tmpT.getTo());
-				}
-			}
-		}
-		return false;
-	}
+
 	
 	public static void printTransitionSystem(TransitionSystem ts)
 	{
@@ -317,43 +290,7 @@ public class Utilities{
 		return set;
 	}	
 	
-	public static TransitionSystem acyclicTransitionSystemFromState(TransitionSystem ts, String state)// break loop after specific state
-	{
-		//System.out.println("acyclicTransitionSystemFromState");
-		TransitionSystem nts=new TransitionSystem();
-		TransitionSystem tmpTs;
-		LinkedList<String> queue=new LinkedList<String>();
-		queue.add(state);
-		while(queue.isEmpty()!=true)
-		{
-			tmpTs=Utilities.nextImmediateTransitions(ts, queue.removeFirst());			
-			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
-			{
-				Transition tmpT=it.next();
-				//System.out.println(tmpT.getFrom()+tmpT.getLabel()+tmpT.getTo());
-				Transition nt=new Transition(tmpT.getFrom(),tmpT.getLabel(),tmpT.getTo());
-				if(Utilities.addTransitionWillCreateLoop(nts, nt)!=true)
-				{						
-					nts.add(nt);
-					queue.addLast(nt.getTo());
-				}
-				else
-				{
-					nt.setTo(nt.getTo()+"^");
-					nts.add(nt);
-				}
-			}
-		}
-		return nts;
-	}
 
-	
-	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)// break the loop of the transition system
-	{
-		String init=Utilities.findInitialState(ts);
-		return Utilities.acyclicTransitionSystemFromState(ts, init);
-	}
-	
 	public static TransitionSystem nextImmediateTransitions(TransitionSystem ts, String from)// find all immediate transitions started from "from"
 	{
 		//System.out.println("nextTransitions");
@@ -370,7 +307,79 @@ public class Utilities{
 		return nextTransitions;
 	}
 	
+	public static TransitionSystem acyclicTransitionSystem(TransitionSystem ts)// break the loop of the transition system
+	{
+		String init=Utilities.findInitialState(ts);
+		return Utilities.acyclicTransitionSystemFromState(ts, init);
+	}
+	
+	public static TransitionSystem acyclicTransitionSystemFromState(TransitionSystem ts, String state)// break loop after specific state
+	{
+		//System.out.println("acyclicTransitionSystemFromState");
+		TransitionSystem nts=new TransitionSystem();
+		TransitionSystem tmpTs;
+		LinkedList<String> queue=new LinkedList<String>();
+		queue.add(state);
+		while(!queue.isEmpty())
+		{
+			tmpTs=Utilities.nextImmediateTransitions(ts, queue.removeFirst());			
+			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
+			{
+				Transition tmpT=it.next(); //tmpT from the original transitionSystem
+				//System.out.println(tmpT.getFrom()+tmpT.getLabel()+tmpT.getTo());
+				Transition nt=new Transition(tmpT.getFrom(),tmpT.getLabel(),tmpT.getTo());
+				if(Utilities.addTransitionWillCreateLoop(nts, tmpT)!=true)
+				{						
+					//nts.add(tmpT); //there is a case that several transition has the same to state, in order to avoid several to states(actually one), using set to remove the duplication
+					//queue.addLast(tmpT.getTo());
+					nts.add(nt);					
+					queue.addLast(nt.getTo());
+				}
+				else
+				{
+					////don't change the original transition
+					nt.setTo(nt.getTo()+"^");
+					nts.add(nt);
+				}
+			}
+		}
+		return Utilities.removeDuplicationFromTransitionSystem(nts);
+	}
 
+	private static boolean addTransitionWillCreateLoop(TransitionSystem ts, Transition t) //check if there are any transitions from "state" back to "state"
+	{
+		TransitionSystem nts=new TransitionSystem();
+		for(Iterator<Transition> it=ts.iterator();it.hasNext();)
+		{	
+			Transition tmp=it.next();
+			Transition newT=new Transition(tmp.getFrom(),tmp.getLabel(),tmp.getTo());
+			nts.add(newT);
+		}
+		Transition newT=new Transition(t.getFrom(),t.getLabel(),t.getTo());
+		nts.add(newT);
+		String state=t.getFrom();
+		
+		LinkedList<String> queue=new LinkedList<String>(); //a set of states that have not been visited
+		queue.add(state);
+		TransitionSystem tmpTs;
+		while(queue.isEmpty()!=true)
+		{
+			tmpTs=Utilities.nextImmediateTransitions(nts, queue.removeFirst());
+			for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
+			{
+				Transition tmpT=it.next();
+				if(tmpT.getTo().equals(state)) //from state to state, a loop
+				{
+					return true;
+				}
+				else
+				{
+					queue.add(tmpT.getTo());
+				}
+			}
+		}
+		return false;
+	}
 	
 	public static void ExtendEventsToProcess(Process p,EventSet e) //when two process deterministic select, nondeterministic, execute sequentially, loop, the alphabet and refusals need to be extended
 	{
@@ -517,6 +526,84 @@ public class Utilities{
 		}
 	}
 	
+	public static TransitionSystem removeDuplicationFromTransitionSystem(TransitionSystem ts)
+	{
+		HashSet<Transition> set=new HashSet<Transition>();
+		for(Iterator<Transition> pit=ts.iterator(); pit.hasNext();)
+		{
+			Transition pt=pit.next();
+			for(Iterator<Transition> qit=ts.iterator();qit.hasNext();)
+			{
+				Transition qt=qit.next();
+				if(pt!=qt&&set.contains(qt)==false&&pt.getFrom().equals(qt.getFrom())&&pt.getTo().equals(qt.getTo())&&pt.getLabel().equals(qt.getLabel()))
+				{
+					set.add(pt);
+				}
+			}
+		}
+		for(Iterator<Transition> it=set.iterator();it.hasNext();)
+			ts.remove(it.next());
+		return ts;
+	}
+	
+	public static TransitionSystem filterTransitionSystem(EventSet evts, TransitionSystem ts)
+	{
+		TransitionSystem newTs=new TransitionSystem();
+		String initial=Utilities.findInitialState(ts);
+		
+		LinkedList<Transition> queue=new LinkedList<Transition>(); //a set of states that have not been visited
+		TransitionSystem tmpTs=Utilities.nextImmediateTransitions(ts, initial);
+		for(Iterator<Transition> it=tmpTs.iterator();it.hasNext();)
+		{
+			queue.add(it.next());
+		}
+		while(!queue.isEmpty())
+		{
+			Utilities.filterNextTransition(evts, newTs, ts, queue);
+		}
+		
+		return removeDuplicationFromTransitionSystem(newTs);
+	}
+	
+	private static void filterNextTransition(EventSet evts, TransitionSystem newTs, TransitionSystem ts, LinkedList<Transition> queue)
+	{
+			Transition t=queue.removeFirst();
+			if(evts.contains(t.getLabel()))
+			{
+				TransitionSystem tmpTsc=Utilities.nextImmediateTransitions(ts, t.getTo());
+				if(tmpTsc.isEmpty())//the last transition with labels in evts, change the predecessor's to.
+				{
+					for(Iterator<Transition> newIt=newTs.iterator();newIt.hasNext();)
+					{
+						Transition tmpT=newIt.next();
+						if(tmpT.getTo().equals(t.getFrom()))
+						{
+							tmpT.setTo(t.getTo());
+						}
+					}
+				}
+				else
+				{
+					for(Iterator<Transition> cit=tmpTsc.iterator();cit.hasNext();)
+					{
+						Transition tmpT=cit.next();
+						Transition newT=new Transition(t.getFrom(),tmpT.getLabel(),tmpT.getTo());
+						queue.add(newT);
+					}
+				}
+			}
+			else
+			{
+				Transition newT=new Transition(t.getFrom(),t.getLabel(),t.getTo());
+				newTs.add(newT);
+				TransitionSystem tmpTsc=Utilities.nextImmediateTransitions(ts, t.getTo());
+				for(Iterator<Transition> cit=tmpTsc.iterator();cit.hasNext();)
+				{
+					queue.add(cit.next());
+				}
+			}	
+	}
+	
 	public static void filterCategoryTransition(EventSet evts, CategoryTransition ct)//filter category transition by using the evts
 	{
 		 filterObjectState(evts,ct.getInit(),null,null);
@@ -525,6 +612,8 @@ public class Utilities{
 	private static void filterObjectState(EventSet evts, ObjectState os, ListIterator<ObjectState> lit, List<ObjectState> list)//remove events in evts from all children of os
 	//because Iterator cannot be modified by using add or remove, ListIterator is used , and lit is used to track the position of ListIterator
 	{
+
+		
 		if(list!=null)// list is used to denote the children of a objectstate which has been removed. the objectstate contains the event in evts
 		{
 			for(ListIterator<ObjectState> it=list.listIterator();it.hasNext();) 
