@@ -14,7 +14,7 @@ public class TestDotLoaderAndFilterTransition {
     public static void main(String[] args)
     {		
     	
-    	TransitionSystem tsOddie=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\match-4_Oddie.dot");
+    	TransitionSystem tsOddie=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\match-4_ClientB.dot");
 //    	Utilities.printTransitionSystem(tsOddie);
 //    	System.out.println();
     	tsOddie=Utilities.acyclicTransitionSystem(tsOddie);
@@ -29,7 +29,7 @@ public class TestDotLoaderAndFilterTransition {
     	Utilities.printProcess(pOddie);
     	System.out.println();
     	
-    	TransitionSystem tsSteven=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\match-4_Steven.dot");
+    	TransitionSystem tsSteven=DotLoader.fileToTransitionSystem("C:\\Users\\zhuming\\Dropbox\\SDK\\latest\\match-4_ClientA.dot");
 //    	Utilities.printTransitionSystem(tsSteven);
 //    	System.out.println();
     	tsSteven=Utilities.acyclicTransitionSystem(tsSteven);

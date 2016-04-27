@@ -27,7 +27,7 @@ import java.util.*;
 
 public class ProcessXML {
 	
-	  ProcessXML(HashSet<ConcreteProcess> ps)
+	  public ProcessXML(HashSet<ConcreteProcess> ps)
 	  {
 	  try {
 		  	DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();

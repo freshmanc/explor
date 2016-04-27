@@ -32,9 +32,11 @@ public class FunctorFailures extends HashMap<Trace, Trace>{ //save two categorie
 					if(Utilities.compTrace(dsgtmpf.getTrace(),imptmpf.getTrace()))
 					{
 						//System.out.println(dsgtmpf.getTrace() +"    "+imptmpf.getTrace());
-						Refusal impRefusal=Utilities.filterRefursal(imptmpf.getRefusal(), dsgData.getAlphabet());
+						Refusal impRefusal=imptmpf.getRefusal();
+						//Refusal impRefusal=Utilities.filterRefursal(imptmpf.getRefusal(), dsgData.getAlphabet());
 						//System.out.println(dsgtmpf.getRefusal().toString()+"     "+impRefusal);
-						if(Utilities.subSet(impRefusal,dsgtmpf.getRefusal()))
+						//if(Utilities.subSet(impRefusal,dsgtmpf.getRefusal()))????
+						if(Utilities.subSet(dsgtmpf.getRefusal(),impRefusal))
 						{
 							this.put(dsgObj.getTrace(), impObj.getTrace());
 							//System.out.println("same failure");
