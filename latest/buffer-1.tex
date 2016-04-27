@@ -1,0 +1,60 @@
+\subsection{Buffers 1}
+
+A buffer with a capacity of one Word.
+
+\begin{code}
+Data = protocol { w: Word }
+
+Generator = process p: -Data 
+{
+   for (n := 10; n >= 0; n -= 1)
+    {
+        scrch(' \u2191' // n);
+        p.w := n
+    }
+}
+
+Buffer = process i: +Data; o: -Data 
+{
+   empty: Boolean := true;
+   data: Word;
+   loop select 
+   {
+      |empty|
+         data := i.w;
+         empty := false;
+      |not empty|
+         o.w := data;
+         empty := true;
+         case 
+         { 
+           |data = 0| 
+              exit 
+         }
+   }
+}
+
+Receiver = process p: +Data 
+{
+   loop 
+   {
+        val: Word := p.w;
+        scrch(' \u2193' // val);
+        case
+        {   
+            |val = 0|
+                exit
+        }
+   }
+}
+
+Controller = cell 
+{
+  sf, fr: Data;
+  Generator(sf);
+  Buffer(sf, fr);
+  Receiver(fr);
+}
+
+Controller()
+\end{code}

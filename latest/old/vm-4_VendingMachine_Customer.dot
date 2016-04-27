@@ -1,0 +1,15 @@
+digraph g
+{
+   graph [rankdir=LR];
+   edge [arrowsize=0.3,fontsize=10,fontname=Helvetica];
+   node [shape=plaintext,width=.3,height=.2,fontsize=10,fontname=Helvetica];
+   1.1->1.2 [label="#"];
+   1.1->3.3 [label="coin"];
+   3.3->1.1 [label="refund"];
+   3.3->4.4 [label="tea"];
+   3.3->5.5 [label="coffee"];
+   4.4->1.1 [label="green"];
+   4.4->1.1 [label="red"];
+   5.5->1.1 [label="cappuccino"];
+   5.5->1.1 [label="mocha"];
+}

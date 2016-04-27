@@ -1,0 +1,139 @@
+\subsection{A Cluster of Servers --- Improved}
+
+There is a simple solution to the problem encountered in the previous two sections: we disambiguate the replies.  The revised protocol \id{Match} provides a choice of two replies, \id{evenReply} and \id{oddReply}.
+\begin{code}
+NUMREQS = constant 10_000;
+Register = protocol { register | terminate | start | stop }
+Match = protocol 
+{ 
+  start; 
+  *(even | odd | ^evenReply: Word | ^oddReply: Word); 
+  stop 
+}
+\end{code}
+
+The servers are modified to send replies that match requests.
+\begin{code}
+Server = process r: -Register; m: +Match 
+{
+  r.register;
+  loop select 
+    clients: Word := 0;
+  {
+    || m.start; r.start
+    || m.stop; r.stop
+    || r.terminate; exit
+    || m.even; m.evenReply := 2 * rand(100)
+    || m.odd; m.oddReply := 2 * rand(100) + 1
+  }
+}
+\end{code}
+
+Server clusters are unchanged.
+\begin{code}
+Manager = process r: +Register
+{
+  servers: Word := 0;
+  clients: Word := 0;
+  loop select
+  {
+    || r.register; servers += 1
+    || r.start; clients += 1
+    || r.stop; clients -=1;
+       case
+       {
+         |clients = 0|
+            for (s := 0; s <> servers; s += 1)
+              r.terminate;
+            exit
+       }
+  }
+}
+\end{code}
+
+\begin{code}
+Service = cell m: +Match
+{
+  r: Register;
+  Manager(r);
+  Server(r, m);
+  Server(r, m);
+  Server(r, m);
+  Server(r, m);
+  Server(r, m);
+}
+\end{code}
+
+Clients and the customer cluster are also unchanged.
+\begin{code}
+Even = process name: Text; e: -Match
+{
+  e.start;
+  evens: Word := 0;
+  odds: Word := 0;
+  for (r := 0; r < NUMREQS; r += 1)
+  {
+    e.even;
+    n: Word := e.evenReply;
+    case
+    {
+      |n % 2 = 0| evens += 1
+      || odds += 1
+    }
+  }
+  scrln(name // ': ' // evens // '  ' // odds);
+  e.stop;
+}
+\end{code}
+
+\begin{code}
+Odd = process name: Text; o: -Match
+{
+  o.start;
+  evens: Word := 0;
+  odds: Word := 0;
+  for (r := 0; r < NUMREQS; r += 1)
+  {
+    o.odd;
+    n: Word := o.oddReply;
+    case
+    {
+      |n % 2 = 0| evens += 1
+      || odds += 1
+    }
+  }
+  scrln(name // ': ' // odds // '  ' // evens);
+  o.stop;
+}
+\end{code}
+
+\begin{code}
+Customers = process m: -Match
+{
+   Even('Ann  ', m);
+   Odd( 'Bill ', m);
+   Even('Carol', m);
+   Odd( 'David', m);
+}
+\end{code}
+
+Everything is linked together as before.
+\begin{code}
+Main = cell
+{
+  m: Match;
+  Service(m);
+  Customers(m);
+}
+
+Main()
+\end{code}
+
+Even with five servers, all clients are now happy:
+\begin{verbatim}
+Carol: 10000  0
+Ann  : 10000  0
+David: 10000  0
+Bill : 10000  0
+\end{verbatim}
+

@@ -1,0 +1,7 @@
+digraph g
+{
+   graph [rankdir=LR];
+   edge [arrowsize=0.3,fontsize=10,fontname=Helvetica];
+   node [shape=plaintext,width=.3,height=.2,fontsize=10,fontname=Helvetica];
+   1->2 [label="w"];
+}

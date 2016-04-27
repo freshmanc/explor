@@ -1,0 +1,75 @@
+\begin{quotation}
+\noindent\textsl{The text of the remainder of this subsection is the postfix compiled onto the end of every \desi\ program. Its text is in \texttt{postfix.tex}.}
+\end{quotation}
+
+The \emph{controller} is the outer-level framework of a compiled \desi\ program. It is the function invoked by the \jit\ compiler when compilation is complete. Its result is the sum of failed processes. It executes in the main thread of the compiler. In contrast, compiled cells, processes and routines execute in one of the threads created by the controller. As far as the controller is concerned, the key responsibility of the \jit\ compiler is to provide a process named \emph{main} and to define a constant named \textsc{MainWords}, the latter being the number of words the main process needs for its local variables.. 
+
+\begin{tabbing}
+\indents
+\rtn{controller}{$\rightarrow$ f: Word}
+\ooooo{\key{for} n \key{over} ThreadRange \key{do}}
+\ooooooo{threads[n] := new\_thread(n, \textsc{Threads}, executor, \textsc{StackWords})}
+\ooooo{\key{end};}
+\ooooo{Thread ctrl := newTCB(\textsc{Threads});}
+\ooooo{threads[\textsc{Threads}] := ctrl;}
+\ooooo{schedule\_process(make\_process(0, main, \textsc{MainWords}));}
+\ooooo{\key{repeat}}
+\ooooooo{suspend\_control(ctrl);}
+\ooooo{\key{until} program\_complete(ctrl);}
+\ooooo{f := 0;}
+\ooooo{\key{for} n := 0 \key{to} \textsc{Threads} \key{do}}
+\ooooooo{Thread t := threads[n];}
+\ooooooo{f += t.failures;}
+\ooooooo{discardTCB(t);}
+\ooooo{\key{end}}
+\fin
+\end{tabbing}
+
+{\small
+\begin{verbatim}
+% XCD controller(-> ax f)
+controller     zer bx                 % bx n
+_1             psh bx
+               inv new_thread bx THREADS executor STACK_WORDS
+               pop bx                 % bx n
+               mvw [threads+bx*BpW] ax
+               inc bx
+               cmp bx THREADS
+               jne _1
+               
+               inv newTCB THREADS
+               psh ax
+               mvw [threads + THREADS*BpW] ax
+               inv make_process 0 main MainWords
+               inv schedule_process [ax+OWNER] ax
+               
+_2             pop ax                    % ax ctrl
+               psh ax
+               inv suspend_control ax
+               inv program_complete [threads]
+               cmp ax FALSE
+               jeq _2
+               pop ax
+               
+               psh 0                     % [f]
+               zer bx                    % bx n
+_3             mvw cx [threads+bx*BpW]   % cx t
+               pop ax                    % ax f
+               add ax [cx+FAILURES]
+               psh ax                    % [f]
+               psh bx                    % [f n]
+               inv discardTCB cx
+               pop bx                    % bx n
+               inc bx
+               cmp bx THREADS+1
+               jne _3                    % [f]
+               
+               pop ax                    % f
+               ret
+               end
+\end{verbatim}}
+
+\begin{quotation}
+\noindent\textsl{The text now resumes in \texttt{prefix.tex}.}
+\end{quotation}
+

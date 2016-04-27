@@ -1,0 +1,68 @@
+\subsection{Vending Machines 1}\label{sec-vm-1}
+
+This is our first and simplest vending machine.
+
+We begin with a protocol.
+\begin{code}
+Sales = protocol { *( coffee | tea | turn_off | ^service: Text ) }    
+\end{code}
+
+Then we define a vending machine that offers tea or coffee and can be turned off.
+\begin{code}
+VendingMachine = process numCoffee: Word; numTea: Word; rq: +Sales
+{
+    loop select
+    {
+        || rq.coffee; rq.service := 'a cup of coffee'
+        || rq.tea; rq.service := 'a mug of tea'
+        || rq.turn_off; exit
+    }
+}
+\end{code}
+
+Customers randomly request tea or coffee a few times then turn the machine off.
+\begin{code}
+Customer = process name: Text; numTries: Word; rq: -Sales
+{
+    for (t := 0; t <> numTries; t += 1)
+    {
+        r: Word := rand(2);
+        assert 0 <= r and r <= 1;
+        case r
+        {
+            |0| rq.coffee
+            |1| rq.tea
+        }
+        scrln(name // ' gets ' // rq.service)
+    }
+    rq.turn_off
+}
+\end{code}
+
+The vending machine and one customer are linked together\textellipsis
+\begin{code}
+Controller = cell
+{
+    rq: Sales;
+    VendingMachine(10, 10, rq);
+    Customer('Fred', 10, rq);
+}
+\end{code}
+\textellipsis\ and executed.
+\begin{code}
+Controller()
+\end{code}
+
+Here's the output:
+\begin{verbatim}
+Fred gets a cup of coffee
+Fred gets a mug of tea
+Fred gets a cup of coffee
+Fred gets a cup of coffee
+Fred gets a mug of tea
+Fred gets a cup of coffee
+Fred gets a cup of coffee
+Fred gets a mug of tea
+Fred gets a cup of coffee
+Fred gets a mug of tea
+\end{verbatim}

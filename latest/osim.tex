@@ -1,0 +1,27 @@
+\begin{code}
+Simulator = process os: Server OS
+{
+    scrChan: Channel Screen
+    scrPort: Server Screen :=scrChan
+    kbdChan: Channel Keyboard
+    kbdPort: Client Keyboard := kbdChan
+    loop select
+    {
+        || os.scr := scrChan
+        || os.kbd := kbdChan
+        || msg: Text := scrPort.out; scrch(msg)
+        || msg: Text := scrPort.outln; scrln(msg)
+        || msg: Text := kbdch(); kbdPort.char := msg
+        || msg: Text := kbdln(); kbdPort.line := msg
+    }
+}
+
+System = cell
+{
+    chn: Channel OS
+    Main(chn)
+    Simulator(chn)
+}
+
+System()
+\end{code}

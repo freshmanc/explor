@@ -1,0 +1,12 @@
+digraph g
+{
+   graph [rankdir=LR];
+   edge [arrowsize=0.3,fontsize=10,fontname=Helvetica];
+   node [shape=plaintext,width=.3,height=.2,fontsize=10,fontname=Helvetica];
+   1->3 [label="start"];
+   3->3 [label="even"];
+   3->3 [label="odd"];
+   3->3 [label="reply"];
+   3->4 [label="#"];
+   4->2 [label="stop"];
+}

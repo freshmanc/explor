@@ -1,0 +1,172 @@
+\subsection{A Cluster of Servers --- with problems}
+
+This version of the program is constructed as two clusters: a cluster of servers connected by a single channel to a cluster of clients.  Servers in the cluster must register with a manager.  This allows us to provide clean termination with any number of servers and clients.  \xf{fig-clus} shows the system that we will build in diagrammatic form.
+
+\begin{figure}[htbp]
+$$\includegraphics{fig-10.mps}$$
+\caption{Two process clusters: servers and clients}
+\label{fig-clus}
+\end{figure}
+
+There is a new protocol, \id{Register}, which servers use to communicate with their manager.
+\begin{code}
+NUMREQS = constant 10_000;
+Register = protocol { register | terminate | start | stop }
+Match = protocol { start; *(even | odd | ^reply: Word); stop }
+\end{code}
+
+A server must use the signal \id{register} to indicate its willingness to serve.  When the manager sends a \id{terminate} signal, the server quits.The \id{start} and \id{stop} signals from clients are forwarded to the manager.
+\begin{code}
+Server = process r: -Register; m: +Match 
+{
+  r.register;
+  loop select 
+    clients: Word := 0;
+  {
+    || m.start; r.start
+    || m.stop; r.stop
+    || r.terminate; exit
+    || m.even; m.reply := 2 * rand(100)
+    || m.odd; m.reply := 2 * rand(100) + 1
+  }
+}
+\end{code}
+
+The manager keeps counts of both servers and clients, using \id{register} and \id{start} signals, respectively.  When the last client sends \id{stop}, the manager sends one \id{terminate} signal for each server.
+\begin{code}
+Manager = process r: +Register
+{
+  servers: Word := 0;
+  clients: Word := 0;
+  loop select
+  {
+    || r.register; servers += 1
+    || r.start; clients += 1
+    || r.stop; clients -=1;
+       case
+       {
+         |clients = 0|
+            for (s := 0; s <> servers; s += 1)
+              r.terminate;
+            exit
+       }
+  }
+}
+\end{code}
+
+The server cluster can have any number of servers, but is shown here with just one.
+\begin{code}
+Service = cell m: +Match
+{
+  r: Register;
+  Manager(r);
+  Server(r, m);
+}
+\end{code}
+
+Clients are more or less the same as before.  They are now called \id{Even} and \id{Odd}, and are passed a unique name on start-up.
+\begin{code}
+Even = process name: Text; e: -Match
+{
+  e.start;
+  evens: Word := 0;
+  odds: Word := 0;
+  for (r := 0; r < NUMREQS; r += 1)
+  {
+    e.even;
+    n: Word := e.reply;
+    case
+    {
+      |n % 2 = 0| evens += 1
+      || odds += 1
+    }
+  }
+  scrln(name // ': ' // evens // '  ' // odds);
+  e.stop;
+}
+\end{code}
+
+\begin{code}
+Odd = process name: Text; o: -Match
+{
+  o.start;
+  evens: Word := 0;
+  odds: Word := 0;
+  for (r := 0; r < NUMREQS; r += 1)
+  {
+    o.odd;
+    n: Word := o.reply;
+    case
+    {
+      |n % 2 = 0| evens += 1
+      || odds += 1
+    }
+  }
+  scrln(name // ': ' // odds // '  ' // evens);
+  o.stop;
+}
+\end{code}
+
+The customer cluster is a cell containing a number of clients connected to a single channel. 
+\begin{code}
+Customers = process m: -Match
+{
+   Even('Ann  ', m);
+   Odd( 'Bill ', m);
+   Even('Carol', m);
+   Odd( 'David', m);
+}
+\end{code}
+
+The program connects a collection of servers to a collection of clients.
+\begin{code}
+Main = cell
+{
+  m: Match;
+  Service(m);
+  Customers(m);
+}
+
+Main()
+\end{code}
+
+All is well with one server:
+\begin{verbatim}
+Carol: 10000  0
+Ann  : 10000  0
+David: 10000  0
+Bill : 10000  0
+\end{verbatim}
+
+With two servers, however, problems arise.  Some clients get inappropriate replies:
+\begin{verbatim}
+Carol: 10000  0
+Ann  : 9568  432
+David: 9568  432
+Bill : 10000  0
+\end{verbatim}
+
+Here is a cluster with five servers:
+\begin{dummy}
+Service = cell m: +Match
+{
+  r: Register;
+  Manager(r);
+  Server(r, m);
+  Server(r, m);
+  Server(r, m);
+  Server(r, m);
+  Server(r, m);
+}
+\end{dummy}
+
+Running the program with this cluster gives even worse results:
+\begin{verbatim}
+Carol: 7140  2860
+Ann  : 6966  3034
+David: 7389  2611
+Bill : 6717  3283
+\end{verbatim}
+
+The problem, of course, is the one that we described in the previous section: all replies have the same tag, \id{reply}, and may therefore get confused.
+

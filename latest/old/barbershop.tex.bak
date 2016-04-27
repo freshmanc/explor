@@ -1,0 +1,82 @@
+A vending machine that provides free drinks
+\begin{code}
+NUM_CHAIRS = constant 3;
+prot = protocol { customer: Text }
+barber = process start: +prot; finish : -prot; sleeping : Boolean
+{
+    loop
+    {
+        sleeping := true;
+        customer: Text := start.customer;
+        sleeping := false;
+        finish.customer := customer // ' had hair cut'
+    }
+}
+
+waitingRoom = process arrives:+prot; leaves:-prot; sleeping:Boolean; start:-prot; finish:+prot
+{
+    chairs : Word indexes Text;
+    for (c := 0; c < NUM_CHAIRS; c += 1)
+    {
+        chairs [c] := ' ' ;
+    }
+    loop select
+    {
+        | sleeping |
+            start .customer := arrives.customer
+        |not sleeping|
+            customer: Text := arrives .customer;
+            any name in range chairs such that name = ''
+            {
+                name := customer
+            }
+            else
+            {
+                leaves.customer := customer // ' went away'
+            }
+        ||
+            leaves .customer := finish .customer;
+            any name in range chairs such that name <> ''
+            {
+                start.customer := name;
+                name := ''
+            }
+    }
+}
+
+barberShop = cell arrives : +prot; leaves : -prot
+{
+    sleeping : Boolean := false;
+    start : prot ;
+    finish : prot ;
+    barber( start , finish , sleeping );
+    waitingRoom(arrives, leaves, sleeping , start , finish );
+}
+
+customerGenerator = process start: -prot
+{
+    for (custnum :=0; custnum < 20; custnum += 1)
+    {
+        start .customer := 'C' // custnum
+    }
+}
+
+reporter = process finish: +prot
+{
+    loop
+    {
+        scrln( nish .customer // '\n')
+    }
+}
+
+village = cell
+{
+    arrives : prot ;
+    leaves : prot ;
+    customerGenerator(arrives);
+    reporter ( leaves );
+    barberShop(arrives, leaves );
+}
+
+village ();
+\end{code}

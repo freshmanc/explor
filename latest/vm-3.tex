@@ -1,0 +1,102 @@
+\subsection{Vending Machines 3}\label{sec-vm-3}
+
+The vending machine in this example avoids the problem of the previous machine by keeping a count of customers registered.  When a customer sends a \id{turn\_off} signal, the count is deccremented.  When it reaches zero, the vending machine shuts down.
+
+We add \id{register} to the protocol for customer registration.
+\begin{code}
+Sales = protocol { *( register: Text | coffee | tea | turn_off | ^service: Text ) }    
+\end{code}
+
+The vending machine allows customers to register and maintains the number of registered customers.  Registration is not a requirement --- unregistered customers will be served --- but could be made so.
+\begin{code}
+VendingMachine = process numCoffee: Word; numTea: Word; rq: +Sales
+{
+    numCust: Word := 0;
+    loop select
+    {
+        ||  name: Text := rq.register; 
+            scrln(name // ' registered');
+            numCust += 1
+        ||  rq.coffee; 
+            case
+            {
+                |numCoffee > 0| 
+                    rq.service := 'a cup of coffee (' // numCoffee // ')';
+                                numCoffee -= 1
+                || rq.service := 'nothing (no coffee left)'
+            }
+        ||  rq.tea; 
+            case
+            {
+                |numTea > 0| rq.service := 'a cup of tea (' // numTea // ')';
+                                numTea -= 1
+                || rq.service := 'nothing (no tea left)'
+            }
+        ||  rq.turn_off;
+            numCust -= 1;
+            case
+            {
+                |numCust = 0| 
+                    scrln('Vending machine closing down');
+                    exit;
+            }
+    }
+}
+\end{code}
+
+Customers now register before using the machine.
+\begin{code}
+Customer = process name: Text; numTries: Word; rq: -Sales
+{
+    rq.register := name;
+    for (t := 0; t <> numTries; t += 1)
+    {
+        r: Word := rand(2);
+        assert 0 <= r and r <= 1;
+        case r
+        {
+            |0| rq.coffee
+            |1| rq.tea
+        }
+        scrln(name // ' gets ' // rq.service)
+    }
+    rq.turn_off;
+    scrln(name // ' finished');
+}
+\end{code}
+
+The rest of the code remains unchanged.
+\begin{code}
+Controller = cell
+{
+    rq: Sales;
+    VendingMachine(15, 15, rq);
+    Customer('Fred', 10, rq);
+    Customer('Jane', 15, rq);
+    Customer('Kate', 15, rq);
+}
+\end{code}
+
+\begin{code}
+Controller()
+\end{code}
+
+Here is an extract from the output from this program:
+\begin{verbatim}
+Fred registered
+Jane registered
+Kate registered
+Fred gets a cup of coffee (15)
+Jane gets a cup of coffee (14)
+Jane gets a cup of coffee (2)
+....
+Jane gets a cup of coffee (1)
+Kate gets nothing (no coffee left)
+Jane gets nothing (no tea left)
+Kate gets nothing (no coffee left)
+Jane gets nothing (no coffee left)
+Kate gets nothing (no coffee left)
+Jane finished
+Vending machine closing down
+Kate finished
+\end{verbatim}

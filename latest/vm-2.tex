@@ -1,0 +1,81 @@
+\subsection{Vending Machines 2}\label{sec-vm-2}
+
+The new, upgraded vending machine keeps track of the amount of tea and coffee left.
+
+The protocol is the same as before.
+\begin{code}
+Sales = protocol { *( coffee | tea | turn_off | ^service: Text ) }    
+\end{code}
+
+The vending machine is started with finite supplies of tea and coffee that become depleted as the machine is used.  The reply from the machine shows the quantity available \emph{before} the request is serviced.
+\begin{code}
+VendingMachine = process numCoffee: Word; numTea: Word; rq: +Sales
+{
+    loop select
+    {
+        ||  rq.coffee; 
+            case
+            {
+                |numCoffee > 0| 
+                    rq.service := 'a cup of coffee (' // numCoffee // ')';
+                                numCoffee -= 1
+                || rq.service := 'nothing (no coffee left)'
+            }
+        ||  rq.tea; 
+            case
+            {
+                |numTea > 0| rq.service := 'a cup of tea (' // numTea // ')';
+                                numTea -= 1
+                || rq.service := 'nothing (no tea left)'
+            }
+        ||  rq.turn_off; exit
+    }
+}
+\end{code}
+
+Customers are the same as before.
+\begin{code}
+Customer = process name: Text; numTries: Word; rq: -Sales
+{
+    for (t := 0; t <> numTries; t += 1)
+    {
+        r: Word := rand(2);
+        assert 0 <= r and r <= 1;
+        case r
+        {
+            |0| rq.coffee
+            |1| rq.tea
+        }
+        scrln(name // ' gets ' // rq.service)
+    }
+    rq.turn_off
+}
+\end{code}
+
+This time we provide two customers.
+\begin{code}
+Controller = cell
+{
+    rq: Sales;
+    VendingMachine(10, 10, rq);
+    Customer('Fred', 10, rq);
+    Customer('Jane', 15, rq);
+}
+\end{code}
+
+\begin{code}
+Controller()
+\end{code}
+
+The machine works quite well (see partial output below), but it has a flaw.  Whenever \emph{any} customer sends a \id{turn\_off} signal, the vending machine shuts down, even though other customers may be waiting.  Trying to correct the flaw by having \id{Controller} send the \id{turn\_off} signal is even worse: the vending machine is shut down before the customers get a chance to use it!
+\begin{verbatim}
+Fred gets a cup of coffee (10)
+Jane gets a cup of coffee (9)
+Fred gets a cup of tea (10)
+....
+Jane gets a cup of tea (2)
+Fred gets a cup of coffee (3)
+Jane gets a cup of tea (1)
+Fred gets nothing (no tea left)
+Jane gets nothing (no tea left)
+\end{verbatim}

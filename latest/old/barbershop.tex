@@ -1,0 +1,17 @@
+A vending machine that provides free drinks
+\begin{code}
+NUM_CHAIRS = constant 3;
+protCustomer = protocol {come;leave}
+portStatus = protocol {busy|free}
+barber = process customer: +protCustomer; status : -portStatus
+{
+    loop
+    {
+        customer.come;
+        status.busy;
+        customer.leave;
+        status.free;
+    }
+}
+
+\end{code}

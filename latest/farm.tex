@@ -1,0 +1,78 @@
+\begin{code}
+
+Level=protocol{low|normal|high}
+Pump=protocol{on|off}
+Valve=protocol{open|close}
+Signal=protocol{measuring}
+
+LevelMeasure = process  currentLevel:-Level; tankLevel:+Level
+{
+    loop
+    {
+        select
+        {
+            ||tankLevel.low;currentLevel.low
+            ||tankLevel.normal;currentLevel.normal
+            ||tankLevel.high;currentLevel.high
+        }
+    }
+}
+
+Controller = process monitorPump:+Pump;monitorValve:+Valve; tankPump:-Pump;tankValve:-Valve
+{
+    loop
+    {
+        select
+        {
+            ||monitorPump.on;tankPump.on
+            ||monitorPump.off;tankPump.off
+            ||monitorValve.open;tankValve.open
+            ||monitorValve.close;tankValve.close
+        }
+    }
+}
+
+Monitor = process currentLevel:+Level; monitorPump:-Pump;monitorValve:-Valve
+{
+    loop
+    {
+        select
+        {
+            ||currentLevel.normal;monitorPump.off;monitorValve.close;
+            ||currentLevel.low;monitorPump.on;monitorValve.close;
+            ||currentLevel.high;monitorPump.off;monitorValve.open;
+        }
+    }
+}
+
+Tank = process tankLevel:-Level;tankPump:+Pump;tankValve:+Valve
+{
+    loop
+    {
+        select
+        {
+            ||tankPump.off;tankValve.open;tankLevel.low
+            ||tankPump.off;tankValve.close;tankLevel.normal
+            ||tankPump.on;tankValve.close;tankLevel.high
+        }
+      
+    }
+    
+}
+
+Manager = cell
+{
+    tankLevel: Channel Level;
+    tankPump: Channel Pump;
+    tankValve: Channel Valve;
+    monitorPump: Channel Pump;
+    monitorValve: Channel Valve;
+    currentLevel: Channel Level;
+    LevelMeasure(currentLevel, tankLevel);
+    Controller(monitorPump,monitorValve,tankPump,tankValve);
+    Monitor(currentLevel,monitorPump,monitorValve);
+    Tank(tankLevel;tankPump;tankValve);
+}
+
+Manager()
+\end{code}

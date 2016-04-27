@@ -1,0 +1,109 @@
+\begin{code}
+
+Level=protocol{low|normal|high}
+Pump=protocol{on|off}
+Valve=protocol{open|close}
+Signal=protocol{measuring}
+
+LevelMeasure = process  currentLevel:-Level; tankLevel:+Level
+{
+    loop
+    {
+        select
+        {
+            ||tankLevel.low;currentLevel.low
+            ||tankLevel.normal;currentLevel.normal
+            ||tankLevel.high;currentLevel.high
+        }
+    }
+}
+
+Controller = process monitorPump:+Pump;monitorValve:+Valve; tankPump:-Pump;tankValve:-Valve
+{
+    loop
+    {
+        select
+        {
+            ||monitorPump.on;tankPump.on
+            ||monitorPump.off;tankPump.off
+            ||monitorValve.open;tankValve.open
+            ||monitorValve.close;tankValve.close
+        }
+    }
+}
+
+Monitor = process currentLevel:+Level; monitorPump:-Pump;monitorValve:-Valve
+{
+    loop
+    {
+        select
+        {
+            ||currentLevel.normal;monitorPump.off;monitorValve.close;
+            ||currentLevel.low;monitorPump.on;monitorValve.close;
+            ||currentLevel.high;monitorPump.off;monitorValve.open;
+        }
+    }
+}
+
+Tank = process tankLevel:-Level;tankPump:+Pump;tankValve:+Valve
+{
+    ||
+}
+
+
+
+
+Tasks = protocol {task1|task2|task3 |product1|product2|product3}
+
+Producer = process p: -Tasks
+{
+    for (i := 0; i < numTasks; i += 1)
+    {
+        case
+        {
+            ||p.task1
+            ||p.task2
+            ||p.task3
+        }
+    }
+}
+
+Worker = process  p: +Tasks; q: -Tasks;
+{    loop
+    {
+        select
+        {
+            ||p.task1;q.product1
+            ||p.task2;q.product2
+            ||p.task3;q.product3
+        }
+    }
+}
+
+Consumer = process q: +Tasks 
+{
+    loop
+    {
+        select
+        {
+            || q.product1
+            || q.product2
+            || q.product3
+        }
+        
+    }
+}
+
+Manager = cell
+{
+    p, q: Channel Tasks;
+    Producer(p);
+    Consumer(q);
+    Worker(p, q);
+    Worker(p, q);
+    Worker(p, q);
+    Worker(p, q);
+}
+
+Manager()
+\end{code}

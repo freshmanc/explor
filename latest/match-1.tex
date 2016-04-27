@@ -1,0 +1,88 @@
+\subsection{Unconditional Response}
+
+We define a constant, \id{NUMREQS}, that determines the length of the test, and a protocol, \id{Match}, that provides two kinds of request.  We expect an \id{odd} request to yield an odd \id{reply} and an \id{even} request to yield an even \id{reply}.
+\begin{code}
+NUMREQS = constant 10_000;
+Match = protocol { even | odd | ^reply: Word }
+\end{code}
+
+The server responds to a request with a number of the appropriate parity.  It assumes (!) that there are two clients and terminates after processing $2 \times \id{NUMREQS}$ requests.
+\begin{code}
+Server = process p: +Match
+{
+  loop k: Word := rand(100); requests: Word := 0;
+  {
+    |requests = 2 * NUMREQS| exit
+    ||
+      requests += 1;
+      select
+      {
+        || p.even; p.reply := 2 * k;
+        || p.odd; p.reply := 2 * k + 1;
+      }
+  }
+}
+\end{code}
+
+Process \id{Steven} requests even numbers and classifies the replies by parity.  The report gives the number of expected replies (even numbers) received followed by the count of unexpected replies (odd numbers) received.
+\begin{code}
+Steven = process e: -Match
+{
+  evens: Word := 0;
+  odds: Word := 0;
+  for (r := 0; r < NUMREQS; r += 1)
+  {
+    e.even;
+    n: Word := e.reply;
+    case
+    {
+      |n % 2 = 0| evens += 1
+      || odds += 1
+    }
+  }
+  scrln('Steven: ' // evens // '  ' // odds)
+}
+\end{code}
+
+Process \id{Oddie} 
+\footnote{Footlight \url{https://en.wikipedia.org/wiki/Bill_Oddie}}
+is similar to \id{Steven} but expects odd numbers rather than even numbers.
+\begin{code}
+Oddie = process o: -Match
+{
+  evens: Word := 0;
+  odds: Word := 0;
+  for (r := 0; r < NUMREQS; r += 1)
+  {
+    o.odd;
+    n: Word := o.reply;
+    case
+    {
+      |n % 2 = 0| evens += 1
+      || odds += 1
+    }
+  }
+  scrln('Oddie:  ' // odds // '  ' // evens)
+}
+\end{code}
+
+The program consists of a \id{Server} and one client of each parity.
+\begin{code}
+Main = cell
+{
+  m: Match;
+  Server(m);
+  Steven(m);
+  Oddie(m);
+}
+
+Main()
+\end{code}
+
+The program generates the following output:
+\begin{verbatim}
+Steven: 10000 0
+Oddie:  10000 0
+\end{verbatim}
+
+Why is it that \id{Steven} never receives an odd number and \id{Oddie} never receives an even number?  Suppose that both clients have issued a request and that the server has accepted \id{Steven}'s request.  When the server indicates that it has a reply ready, \id{Steven} is waiting for the reply but \id{Oddie} is waiting for its request to be processed.  Consequently, \id{Steven} gets the even number.

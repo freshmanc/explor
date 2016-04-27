@@ -1,0 +1,262 @@
+file "prelude"
+line LW390
+lbl LA1484
+rtn "kbdch"
+ext "C" "kbdch"
+end
+line LW391
+lbl LA1489
+rtn "scrch"
+ext "C" "scrch"
+end
+line LW393
+lbl LA1494
+rtn "kbdln"
+ext "C" "kbdln"
+end
+line LW394
+lbl LA1499
+rtn "scrln"
+ext "C" "scrln"
+end
+line LW402
+lbl LA1510
+rtn "open"
+ext "C" "open"
+end
+line LW403
+lbl LA1515
+rtn "close"
+ext "C" "close"
+end
+line LW404
+lbl LA1523
+rtn "state"
+ext "C" "state"
+end
+line LW405
+lbl LA1531
+rtn "eof"
+ext "C" "eof"
+end
+line LW406
+lbl LA1539
+rtn "read"
+ext "C" "read"
+end
+line LW407
+lbl LA1547
+rtn "write"
+ext "C" "write"
+end
+line LW414
+lbl LA1555
+rtn "abs"
+ext "C" "abs_real"
+end
+line LW415
+lbl LA1563
+rtn "abs"
+ext "C" "abs_word"
+end
+line LW416
+lbl LA1571
+rtn "sqrt"
+ext "C" "sqrt_real"
+end
+line LW417
+lbl LA1579
+rtn "exp"
+ext "C" "exp_real"
+end
+line LW418
+lbl LA1587
+rtn "log"
+ext "C" "log_real"
+end
+line LW419
+lbl LA1595
+rtn "sin"
+ext "C" "sin_real"
+end
+line LW420
+lbl LA1603
+rtn "cos"
+ext "C" "cos_real"
+end
+line LW421
+lbl LA1611
+rtn "tan"
+ext "C" "tan_real"
+end
+line LW422
+lbl LA1619
+rtn "atan"
+ext "C" "atan_real"
+end
+line LW423
+lbl LA1629
+rtn "atan2"
+ext "C" "atan2_real_real"
+end
+line LW432
+lbl LA1637
+rtn "rand"
+ext "C" "rand_word"
+end
+line LW437
+lbl LA1645
+rtn "rand"
+ext "C" "rand_real"
+end
+line LW442
+lbl LA1650
+rtn "rand"
+ext "C" "rand_unit"
+end
+line LW447
+lbl LA1655
+rtn "seed"
+ext "C" "rand_seed"
+end
+file "match-4.tex"
+line LW12
+lbl LA1763
+prc "Server"
+chn UP1716 LW9 "p"
+  fld LW0 "requestA"
+  fld LW1 "requestB"
+  fld LW2 "requestC"
+  fld LW3 "infoA"
+  fld LW4 "infoB"
+  fld LW5 "infoC"
+  fld LW6 "resultA"
+  fld LW7 "resultB"
+  fld LW8 "resultC"
+blk
+tmp GW2082
+tmp GW2099
+tmp GW2101
+tmp GB2116
+tmp GB2136
+tmp GB2156
+edec
+cpy GW2082 LW0
+line LW14
+lbl LA2088
+cpy GW2099 LW2
+cpy GW2101 GW2099
+lbl LA2094
+add GW2099 GW2099 LW1
+rem GW2099 GW2099 LW3
+jtb GW2099 LA2096 LA2097 LA2098
+line LW16
+lbl LA2096
+nrqy GB2116 UP1716 LW0
+jf LA2089 GB2116
+line LW16
+rsig UP1716 LW0
+line LW16
+rsig UP1716 LW3
+line LW16
+rsig UP1716 LW6
+ja LA2090
+lbl LA2097
+nrqy GB2136 UP1716 LW1
+jf LA2089 GB2136
+line LW17
+rsig UP1716 LW1
+line LW17
+rsig UP1716 LW4
+line LW17
+rsig UP1716 LW7
+ja LA2090
+lbl LA2098
+nrqy GB2156 UP1716 LW2
+jf LA2089 GB2156
+line LW18
+rsig UP1716 LW2
+line LW18
+rsig UP1716 LW5
+line LW18
+rsig UP1716 LW8
+ja LA2090
+lbl LA2089
+jne LA2094 GW2099 GW2101
+wait
+ja LA2094
+lbl LA2090
+cpy GW2082 GW2099
+ja LA2088
+eblk
+end
+line LW22
+lbl LA1828
+prc "Client"
+chn UP1768 LW9 "e"
+  fld LW0 "requestA"
+  fld LW1 "requestB"
+  fld LW2 "requestC"
+  fld LW3 "infoA"
+  fld LW4 "infoB"
+  fld LW5 "infoC"
+  fld LW6 "resultA"
+  fld LW7 "resultB"
+  fld LW8 "resultC"
+blk
+var UW1771 "r"
+edec
+line LW24
+cpy UW1771 LW0
+lbl LA2189
+jge LA2192 UW1771 LW10000
+line LW28
+ssig UP1768 LW0
+line LW28
+ssig UP1768 LW3
+line LW28
+ssig UP1768 LW6
+add UW1771 UW1771 LW1
+ja LA2189
+lbl LA2192
+eblk
+end
+line LW35
+lbl LA1841
+cell "Main"
+blk
+edec
+blk
+crtp UP1833 LW9 "m"
+  fld LW0 "requestA"
+  fld LW1 "requestB"
+  fld LW2 "requestC"
+  fld LW3 "infoA"
+  fld LW4 "infoB"
+  fld LW5 "infoC"
+  fld LW6 "resultA"
+  fld LW7 "resultB"
+  fld LW8 "resultC"
+edec
+line LW38
+argb LW1 LW0
+put UP1833 LW0
+crtx LA1763 "Server" LW1
+arge
+line LW39
+argb LW1 LW0
+put UP1833 LW0
+crtx LA1828 "Client" LW1
+arge
+eblk
+eblk
+end
+line LW42
+entr
+blk
+edec
+argb LW0 LW0
+crtc LA1841 "Main" LW0
+arge
+eblk
+end

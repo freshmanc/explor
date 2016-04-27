@@ -1,0 +1,257 @@
+
+\section{DvmAsm for vm-1}
+\begin{verbatim}
+compile_time  txt "Friday, April 15 at 04:18 PM"
+\end{verbatim}
+
+\subsection{Externals}
+\begin{verbatim}
+ext_dvm_empty_text  ext "dvm_empty_text"
+ext_dvm_discard_text  ext "dvm_discard_text"
+ext_dvm_insert_char  ext "dvm_insert_char"
+ext_dvm_extract_char  ext "dvm_extract_char"
+ext_dvm_insert_text  ext "dvm_insert_text"
+ext_dvm_extract_text  ext "dvm_extract_text"
+ext_dvm_text_bool  ext "dvm_text_bool"
+ext_dvm_text_int  ext "dvm_text_int"
+ext_dvm_text_real  ext "dvm_text_real"
+ext_dvm_text_cat  ext "dvm_text_cat"
+ext_dvm_text_copy  ext "dvm_text_copy"
+ext_dvm_cf_text  ext "dvm_cf_text"
+\end{verbatim}
+
+\subsection{Real constants}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{Text constants}
+\begin{verbatim}
+text0    txt "p"
+\end{verbatim}
+
+\subsection{Allocations}
+
+\subsubsection{Allocations for main}
+\begin{verbatim}
+main_name  txt "program entry"
+main_source  txt "vm-1.tex"
+MainWords  equ 0
+\end{verbatim}
+
+\subsubsection{Allocations for proc\_VendingMachine}
+\begin{verbatim}
+proc_VendingMachine_name  txt "process VendingMachine"
+proc_VendingMachine_source  txt "vm-1.tex"
+Proc_VendingMachineWords  equ 16
+\end{verbatim}
+
+\subsubsection{Allocations for proc\_Customer}
+\begin{verbatim}
+proc_Customer_name  txt "process Customer"
+proc_Customer_source  txt "vm-1.tex"
+Proc_CustomerWords  equ 2
+\end{verbatim}
+
+\subsubsection{Allocations for cell\_Main}
+\begin{verbatim}
+cell_Main_name  txt "cell Main"
+cell_Main_source  txt "vm-1.tex"
+Cell_MainWords  equ 2
+\end{verbatim}
+
+\subsection{Components}
+
+\subsubsection{Definition of main}
+\begin{verbatim}
+         com "program entry"
+main     enterPrc main_source main_name 30
+%invocation of Main
+         newPrc cell_Main Cell_MainWords
+         launchPrc ax
+_exit    nix
+         exitPrc
+         end
+         stk 0
+\end{verbatim}
+
+\subsubsection{Definition of proc\_VendingMachine}
+\begin{verbatim}
+         com "process VendingMachine"
+proc_VendingMachine  enterPrc proc_VendingMachine_source proc_VendingMachine_name 5
+% Proc_VendingMachine_I_p 
+% Proc_VendingMachine_T_1 
+% Proc_VendingMachine_T_2 
+% Proc_VendingMachine_T_3 
+% Proc_VendingMachine_T_4 
+% Proc_VendingMachine_T_5 
+% Proc_VendingMachine_T_6 
+% Proc_VendingMachine_T_7 
+%cpy data 2010 word 0
+         mvw [bp + PrcVar + 1*BpV] 0 
+%line word 7
+         mvw [bp + SRC_LINE] 7
+%lbl addr 2016
+_2016  nix
+%cpy data 2028 word 3
+         mvw [bp + PrcVar + 2*BpV] 3 
+%cpy data 2030 data 2028
+         mvw [bp + PrcVar + 3*BpV] [bp + PrcVar + 2*BpV] 
+%lbl addr 2022
+_2022  nix
+%add data 2028 data 2028 word 1
+         mvw ax [bp + PrcVar + 2*BpV]  
+         add ax 1  
+         mvw [bp + PrcVar + 2*BpV] ax  
+%rem data 2028 data 2028 word 4
+         mvw ax [bp + PrcVar + 2*BpV]  
+         mod ax 4  
+         mvw [bp + PrcVar + 2*BpV] ax  
+%jtb data 2028 addr 2024 addr 2025 addr 2026 addr 2027
+         mvw ax [bp + PrcVar + 2*BpV] 
+         jmx ax _2024 _2025 _2026 _2027  
+%line word 9
+         mvw [bp + SRC_LINE] 9
+%lbl addr 2024
+_2024  nix
+%nrqy data 2045 data 1707 word 0
+         mvw ax [bp + PrcVar + 0*BpV]      
+         mvw bx 0      
+         port_ready WRITERS  
+         mvw [bp + PrcVar + 4*BpV] bx      
+%jf addr 2017 data 2045
+         mzb ax [bp + PrcVar + 4*BpV]  
+         cmp ax 0    
+         jeq _2017      
+%line word 9
+         mvw [bp + SRC_LINE] 9
+%rsig data 1707 word 0
+         receive_signal PrcVar+0*BpV 0  
+%ja addr 2018
+         jmp _2018  
+%lbl addr 2025
+_2025  nix
+%nrqy data 2057 data 1707 word 1
+         mvw ax [bp + PrcVar + 0*BpV]      
+         mvw bx 1      
+         port_ready WRITERS  
+         mvw [bp + PrcVar + 5*BpV] bx      
+%jf addr 2017 data 2057
+         mzb ax [bp + PrcVar + 5*BpV]  
+         cmp ax 0    
+         jeq _2017      
+%line word 10
+         mvw [bp + SRC_LINE] 10
+%rsig data 1707 word 1
+         receive_signal PrcVar+0*BpV 1  
+%ja addr 2018
+         jmp _2018  
+%lbl addr 2026
+_2026  nix
+%nrqy data 2069 data 1707 word 2
+         mvw ax [bp + PrcVar + 0*BpV]      
+         mvw bx 2      
+         port_ready WRITERS  
+         mvw [bp + PrcVar + 6*BpV] bx      
+%jf addr 2017 data 2069
+         mzb ax [bp + PrcVar + 6*BpV]  
+         cmp ax 0    
+         jeq _2017      
+%line word 11
+         mvw [bp + SRC_LINE] 11
+%rsig data 1707 word 2
+         receive_signal PrcVar+0*BpV 2  
+%ja addr 2018
+         jmp _2018  
+%lbl addr 2027
+_2027  nix
+%nrqy data 2081 data 1707 word 3
+         mvw ax [bp + PrcVar + 0*BpV]      
+         mvw bx 3      
+         port_ready WRITERS  
+         mvw [bp + PrcVar + 7*BpV] bx      
+%jf addr 2017 data 2081
+         mzb ax [bp + PrcVar + 7*BpV]  
+         cmp ax 0    
+         jeq _2017      
+%line word 12
+         mvw [bp + SRC_LINE] 12
+%rsig data 1707 word 3
+         receive_signal PrcVar+0*BpV 3  
+%line word 12
+         mvw [bp + SRC_LINE] 12
+%ja addr 2023
+         jmp _2023  
+%lbl addr 2017
+_2017  nix
+%jne addr 2022 data 2028 data 2030
+         mvw ax [bp + PrcVar + 2*BpV]  
+         cmp ax [bp + PrcVar + 3*BpV]  
+         jne _2022      
+%wait
+         inv yield_me        
+%ja addr 2022
+         jmp _2022  
+%lbl addr 2018
+_2018  nix
+%cpy data 2010 data 2028
+         mvw [bp + PrcVar + 1*BpV] [bp + PrcVar + 2*BpV] 
+%ja addr 2016
+         jmp _2016  
+%lbl addr 2023
+_2023  nix
+_exit    nix
+         exitPrc
+         end
+         stk 32
+\end{verbatim}
+
+\subsubsection{Definition of proc\_Customer}
+\begin{verbatim}
+         com "process Customer"
+proc_Customer  enterPrc proc_Customer_source proc_Customer_name 16
+% Proc_Customer_I_p 
+%line word 18
+         mvw [bp + SRC_LINE] 18
+%ssig data 1742 word 1
+         send_signal PrcVar+0*BpV 1  
+%line word 19
+         mvw [bp + SRC_LINE] 19
+%ssig data 1742 word 0
+         send_signal PrcVar+0*BpV 0  
+%line word 20
+         mvw [bp + SRC_LINE] 20
+%ssig data 1742 word 3
+         send_signal PrcVar+0*BpV 3  
+_exit    nix
+         exitPrc
+         end
+         stk 4
+\end{verbatim}
+
+\subsubsection{Definition of cell\_Main}
+\begin{verbatim}
+         com "cell Main"
+cell_Main  enterPrc cell_Main_source cell_Main_name 23
+% Cell_Main_C_p 
+%crtp data 1761 word 4 text 0
+         newChn 4 pp   
+         mvw [bp + PrcVar + 0*BpV] ax      
+%line word 26
+         mvw [bp + SRC_LINE] 26
+%invocation of VendingMachine
+         newPrc proc_VendingMachine Proc_VendingMachineWords
+         mvw [ax + PrcVar + 0*BpV] [bp + PrcVar + 0*BpV] 
+         connectChn [ax + PrcVar + 0*BpV] ax 
+         launchPrc ax
+%line word 27
+         mvw [bp + SRC_LINE] 27
+%invocation of Customer
+         newPrc proc_Customer Proc_CustomerWords
+         mvw [ax + PrcVar + 0*BpV] [bp + PrcVar + 0*BpV] 
+         connectChn [ax + PrcVar + 0*BpV] ax 
+         launchPrc ax
+_exit    nix
+         exitPrc
+         end
+         stk 4
+\end{verbatim}

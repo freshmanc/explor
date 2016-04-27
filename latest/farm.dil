@@ -1,0 +1,336 @@
+file "prelude"
+line LW390
+lbl LA1484
+rtn "kbdch"
+ext "C" "kbdch"
+end
+line LW391
+lbl LA1489
+rtn "scrch"
+ext "C" "scrch"
+end
+line LW393
+lbl LA1494
+rtn "kbdln"
+ext "C" "kbdln"
+end
+line LW394
+lbl LA1499
+rtn "scrln"
+ext "C" "scrln"
+end
+line LW402
+lbl LA1510
+rtn "open"
+ext "C" "open"
+end
+line LW403
+lbl LA1515
+rtn "close"
+ext "C" "close"
+end
+line LW404
+lbl LA1523
+rtn "state"
+ext "C" "state"
+end
+line LW405
+lbl LA1531
+rtn "eof"
+ext "C" "eof"
+end
+line LW406
+lbl LA1539
+rtn "read"
+ext "C" "read"
+end
+line LW407
+lbl LA1547
+rtn "write"
+ext "C" "write"
+end
+line LW414
+lbl LA1555
+rtn "abs"
+ext "C" "abs_real"
+end
+line LW415
+lbl LA1563
+rtn "abs"
+ext "C" "abs_word"
+end
+line LW416
+lbl LA1571
+rtn "sqrt"
+ext "C" "sqrt_real"
+end
+line LW417
+lbl LA1579
+rtn "exp"
+ext "C" "exp_real"
+end
+line LW418
+lbl LA1587
+rtn "log"
+ext "C" "log_real"
+end
+line LW419
+lbl LA1595
+rtn "sin"
+ext "C" "sin_real"
+end
+line LW420
+lbl LA1603
+rtn "cos"
+ext "C" "cos_real"
+end
+line LW421
+lbl LA1611
+rtn "tan"
+ext "C" "tan_real"
+end
+line LW422
+lbl LA1619
+rtn "atan"
+ext "C" "atan_real"
+end
+line LW423
+lbl LA1629
+rtn "atan2"
+ext "C" "atan2_real_real"
+end
+line LW432
+lbl LA1637
+rtn "rand"
+ext "C" "rand_word"
+end
+line LW437
+lbl LA1645
+rtn "rand"
+ext "C" "rand_real"
+end
+line LW442
+lbl LA1650
+rtn "rand"
+ext "C" "rand_unit"
+end
+line LW447
+lbl LA1655
+rtn "seed"
+ext "C" "rand_seed"
+end
+file "farm.tex"
+line LW6
+lbl LA1748
+prc "Producer"
+chn UP1712 LW6 "p"
+  fld LW0 "task1"
+  fld LW1 "task2"
+  fld LW2 "task3"
+  fld LW3 "product1"
+  fld LW4 "product2"
+  fld LW5 "product3"
+blk
+var UW1715 "i"
+edec
+line LW8
+cpy UW1715 LW0
+lbl LA2101
+jge LA2104 UW1715 LW20
+line LW12
+ssig UP1712 LW0
+add UW1715 UW1715 LW1
+ja LA2101
+lbl LA2104
+eblk
+end
+line LW19
+lbl LA1794
+prc "Worker"
+chn UP1753 LW6 "p"
+  fld LW0 "task1"
+  fld LW1 "task2"
+  fld LW2 "task3"
+  fld LW3 "product1"
+  fld LW4 "product2"
+  fld LW5 "product3"
+chn UP1757 LW6 "q"
+  fld LW0 "task1"
+  fld LW1 "task2"
+  fld LW2 "task3"
+  fld LW3 "product1"
+  fld LW4 "product2"
+  fld LW5 "product3"
+blk
+tmp GW2153
+tmp GW2174
+tmp GW2176
+tmp GB2191
+tmp GB2207
+tmp GB2223
+edec
+cpy GW2153 LW0
+line LW22
+lbl LA2159
+cpy GW2174 LW2
+cpy GW2176 GW2174
+lbl LA2169
+add GW2174 GW2174 LW1
+rem GW2174 GW2174 LW3
+jtb GW2174 LA2171 LA2172 LA2173
+line LW24
+lbl LA2171
+nrqy GB2191 UP1753 LW0
+jf LA2164 GB2191
+line LW24
+rsig UP1753 LW0
+line LW24
+ssig UP1757 LW3
+ja LA2165
+lbl LA2172
+nrqy GB2207 UP1753 LW1
+jf LA2164 GB2207
+line LW25
+rsig UP1753 LW1
+line LW25
+ssig UP1757 LW4
+ja LA2165
+lbl LA2173
+nrqy GB2223 UP1753 LW2
+jf LA2164 GB2223
+line LW26
+rsig UP1753 LW2
+line LW26
+ssig UP1757 LW5
+ja LA2165
+lbl LA2164
+jne LA2169 GW2174 GW2176
+wait
+ja LA2169
+lbl LA2165
+cpy GW2153 GW2174
+ja LA2159
+eblk
+end
+line LW31
+lbl LA1824
+prc "Consumer"
+chn UP1799 LW6 "q"
+  fld LW0 "task1"
+  fld LW1 "task2"
+  fld LW2 "task3"
+  fld LW3 "product1"
+  fld LW4 "product2"
+  fld LW5 "product3"
+blk
+tmp GW2250
+tmp GW2271
+tmp GW2273
+tmp GB2288
+tmp GB2300
+tmp GB2312
+edec
+cpy GW2250 LW0
+line LW35
+lbl LA2256
+cpy GW2271 LW2
+cpy GW2273 GW2271
+lbl LA2266
+add GW2271 GW2271 LW1
+rem GW2271 GW2271 LW3
+jtb GW2271 LA2268 LA2269 LA2270
+line LW37
+lbl LA2268
+nrqy GB2288 UP1799 LW3
+jf LA2261 GB2288
+line LW37
+rsig UP1799 LW3
+ja LA2262
+lbl LA2269
+nrqy GB2300 UP1799 LW4
+jf LA2261 GB2300
+line LW38
+rsig UP1799 LW4
+ja LA2262
+lbl LA2270
+nrqy GB2312 UP1799 LW5
+jf LA2261 GB2312
+line LW39
+rsig UP1799 LW5
+ja LA2262
+lbl LA2261
+jne LA2266 GW2271 GW2273
+wait
+ja LA2266
+lbl LA2262
+cpy GW2250 GW2271
+ja LA2256
+eblk
+end
+line LW45
+lbl LA1855
+cell "Manager"
+blk
+edec
+blk
+crtp UP1830 LW6 "p"
+  fld LW0 "task1"
+  fld LW1 "task2"
+  fld LW2 "task3"
+  fld LW3 "product1"
+  fld LW4 "product2"
+  fld LW5 "product3"
+crtp UP1831 LW6 "q"
+  fld LW0 "task1"
+  fld LW1 "task2"
+  fld LW2 "task3"
+  fld LW3 "product1"
+  fld LW4 "product2"
+  fld LW5 "product3"
+edec
+line LW48
+argb LW1 LW0
+put UP1830 LW0
+crtx LA1748 "Producer" LW1
+arge
+line LW49
+argb LW1 LW0
+put UP1831 LW0
+crtx LA1824 "Consumer" LW1
+arge
+line LW50
+argb LW2 LW0
+put UP1830 LW0
+put UP1831 LW1
+crtx LA1794 "Worker" LW2
+arge
+line LW51
+argb LW2 LW0
+put UP1830 LW0
+put UP1831 LW1
+crtx LA1794 "Worker" LW2
+arge
+line LW52
+argb LW2 LW0
+put UP1830 LW0
+put UP1831 LW1
+crtx LA1794 "Worker" LW2
+arge
+line LW53
+argb LW2 LW0
+put UP1830 LW0
+put UP1831 LW1
+crtx LA1794 "Worker" LW2
+arge
+eblk
+eblk
+end
+line LW56
+entr
+blk
+edec
+argb LW0 LW0
+crtc LA1855 "Manager" LW0
+arge
+eblk
+end

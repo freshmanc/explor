@@ -1,0 +1,52 @@
+\subsection{Registering Clients}
+
+We still have the weakness of hard-wiring the number of clients into the code.  One way to avoid this is to require clients to register with the server.
+
+In this version, a client must send the signal \id{start} to the server before sending requests, and must send \id{stop} when it has finished sending requests.
+\begin{code}
+Match = protocol { *(requestA | requestB | requestC| infoA | infoB | infoC | ^resultA |^resultB | ^resultC) }
+\end{code}
+
+The server keeps a count of clients and terminates when a \id{stop} signal brings the count down to zero.  All clients continue to receive the message \id{reply} with the information they asked for.
+\begin{code}
+Server = process p: +Match
+{
+  loop select
+  {
+    || p.requestA;p.infoA; p.resultA
+    || p.requestB;p.infoB; p.resultB
+    || p.requestC;p.infoC; p.resultC
+  }
+}
+
+Client = process e: -Match
+{
+  for (r := 0; r < 10000; r += 1)
+  {
+        case
+        {
+            ||e.requestA;e.infoA;e.resultA;
+            ||e.requestB;e.infoB;e.resultB
+            ||e.requestC;e.infoC;e.resultC;
+        }
+  }
+}
+
+Main = cell
+{
+  m: Channel Match;
+  Server(m);
+  Client(m);
+}
+
+Main()
+\end{code}
+
+Here is the output from a typical run:
+\begin{verbatim}
+Steven: 1455  8545
+Oddie:  7106  2894
+\end{verbatim}
+
+We observe that clients are not getting replies that match their requests.  This is because the server can distinguish requests (\id{even} or \id{odd}) but its replies (\id{reply}) can be accepted by either client.  Clearly, there are sequences in which both clients send requests and the replies get mixed up.
+

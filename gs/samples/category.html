@@ -1,0 +1,409 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Categories of the Vending Machine Example</title>
+<!--<meta name="description" content="A diagram where nodes may belong to multiple groups."  /> -->
+<!-- /* Copyright 1998-2016 by Northwoods Software Corporation. */ -->
+<meta charset="UTF-8">
+<script src="go.js"></script>
+<link href="../assets/css/goSamples.css" rel="stylesheet" type="text/css" />  <!-- you don't need to use this -->
+<script src="goSamples.js"></script>  <!-- this is only for the GoJS Samples framework -->
+<script id="code">
+
+      var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) {
+	  //alert("I am an alert box!");
+      init(xhttp);
+    }
+  };
+  xhttp.open("GET", "categoryfunctor.xml", true);
+  //alert("I am an alert box0000000!");
+  xhttp.send();
+  //alert("I am an alert box1111111!");
+
+
+ var catkey = -1;
+ var key=1;
+ var keyObj=[];
+
+  function keyObjMap(key,obj,category)
+  {
+      this.key=key;
+      this.obj=obj;
+      this.category=category;
+  }
+
+  function init(xml) {
+
+
+  //alert("I am an alert box!!!!!!");
+
+
+    //if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+    var $ = go.GraphObject.make;  // for conciseness in defining templates
+
+    myDiagram =
+      $(go.Diagram, "myDiagram",  // must name or refer to the DIV HTML element
+        {
+          // start everything in the middle of the viewport
+          initialContentAlignment: go.Spot.Center,
+          allowCopy: false,
+          allowDelete: false,
+          draggingTool: $(CustomDraggingTool),
+          layout: $(CustomLayout),
+          // enable undo & redo
+          "undoManager.isEnabled": true
+        });
+
+    // define the Node template
+    myDiagram.nodeTemplate =
+      $(go.Node, "Auto",
+        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+        // define the node's outer shape, which will surround the TextBlock
+        $(go.Shape, "RoundedRectangle",
+          {
+            fill: "rgb(254, 201, 0)", stroke: "black", parameter1: 20,  // the corner has a large radius
+            portId: "", fromSpot: go.Spot.AllSides, toSpot: go.Spot.AllSides
+          }),
+        $(go.TextBlock,
+          new go.Binding("text", "text").makeTwoWay())
+      );
+
+    myDiagram.nodeTemplateMap.add("Super",
+      $(go.Node, "Auto",
+        { locationObjectName: "BODY" },
+        $(go.Shape, "RoundedRectangle",
+          {
+            fill: "rgba(128, 128, 64, 0.5)", strokeWidth: 1.5, parameter1: 20,
+            spot1: go.Spot.TopLeft, spot2: go.Spot.BottomRight, minSize: new go.Size(30, 30)
+          }),
+        $(go.Panel, "Vertical",
+          { margin: 10 },
+          $(go.TextBlock,
+            { font: "bold 10pt sans-serif", margin: new go.Margin(0, 0, 5, 0) },
+            new go.Binding("text")),
+          $(go.Shape,
+            { name: "BODY", opacity: 0 })
+        )
+      ));
+
+    // replace the default Link template in the linkTemplateMap
+    myDiagram.linkTemplate =
+      $(go.Link,  // the whole link panel
+        { routing: go.Link.Orthogonal, corner: 10 },
+        $(go.Shape,  // the link shape
+          { strokeWidth: 1.5 }),
+        $(go.Shape,  // the arrowhead
+          { toArrow: "Standard", stroke: null })
+      );
+
+  var nodeDataArray =  [];
+  var linkDataArray =[];
+  loadCategoryProcess(xml,nodeDataArray,linkDataArray);
+  loadFunctor(xml,linkDataArray);
+  //var keys=[];
+  //keys.push(catkey);
+  //nodeDataArray.push({ key: catkey, text: "vmi1"+"+"+"implement", category: "Super"});
+  //nodeDataArray.push({ key: key, loc:point.x.toString()+" "+point.y.toString(), text: "gg", "supers":keys});
+  //point=new Point(200,200);
+  //nodeDataArray.push({ key: key, loc:point.x.toString()+" "+point.y.toString(), text: "ff", "supers":keys});
+
+
+
+    //alert(linkDataArray);
+
+    myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+    // read in the JSON-format data from the "mySavedModel" element
+    load();
+
+    //loadFunctor(xml);
+  }
+
+  // A custom layout that sizes each "Super" node to be big enough to cover all of it member nodes
+  function CustomLayout() {
+    go.Layout.call(this);
+  }
+  go.Diagram.inherit(CustomLayout, go.Layout);
+
+  /** @override */
+  CustomLayout.prototype.doLayout = function(coll) {
+    if (coll === this.diagram) {
+      coll = this.diagram.nodes;
+    }
+
+    var supers = new go.Set(go.Node);
+    coll.each(function(p) {
+      if (p instanceof go.Node && p.category === "Super") supers.add(p);
+    });
+
+    function membersOf(sup, diag) {
+      var coll = new go.Set(go.Part);
+      var arr = sup.data._members;
+      for (var i = 0; i < arr.length; i++) {
+        var d = arr[i];
+        coll.add(diag.findNodeForData(d));
+      }
+      return coll;
+    }
+
+    function isReady(sup, supers, diag) {
+      var arr = sup.data._members;
+      for (var i = 0; i < arr.length; i++) {
+        var d = arr[i];
+        //alert(d.key);
+        if (d.category !== "Super") continue;
+        var n = diag.findNodeForData(d);
+        if (supers.contains(n)) return false;
+      }
+      return true;
+    }
+
+    // implementations of doLayout that do not make use of a LayoutNetwork
+    // need to perform their own transactions
+    this.diagram.startTransaction("Custom Layout");
+
+    while (supers.count > 0) {
+      var ready = null;
+      var it = supers.iterator;
+      while (it.next()) {
+        if (isReady(it.value, supers, this.diagram)) {
+          ready = it.value;
+          break;
+        }
+      }
+      supers.remove(ready);
+      var b = this.diagram.computePartsBounds(membersOf(ready, this.diagram));
+      ready.location = b.position;
+      var body = ready.findObject("BODY");
+      if (body) body.desiredSize = b.size;
+    }
+
+    this.diagram.commitTransaction("Custom Layout");
+  };
+  // end CustomLayout
+
+
+  // Define a custom DraggingTool
+  function CustomDraggingTool() {
+    go.DraggingTool.call(this);
+  }
+  go.Diagram.inherit(CustomDraggingTool, go.DraggingTool);
+
+  /** @override */
+  CustomDraggingTool.prototype.moveParts = function(parts, offset, check) {
+    go.DraggingTool.prototype.moveParts.call(this, parts, offset, check);
+    this.diagram.layoutDiagram(true);
+  };
+
+  /** @override */
+  CustomDraggingTool.prototype.computeEffectiveCollection = function(parts) {
+    var coll = new go.Set(go.Part).addAll(parts);
+    var tool = this;
+    parts.each(function(p) {
+      tool.walkSubTree(p, coll);
+    });
+    return go.DraggingTool.prototype.computeEffectiveCollection.call(this, coll);
+  };
+
+  // Find other attached nodes.
+  CustomDraggingTool.prototype.walkSubTree = function(sup, coll) {
+    if (sup === null) return;
+    coll.add(sup);
+    if (sup.category !== "Super") return;
+    // recurse through this super state's members
+    var model = this.diagram.model;
+    var mems = sup.data._members;
+    if (mems) {
+      for (var i = 0; i < mems.length; i++) {
+        var mdata = mems[i];
+        this.walkSubTree(this.diagram.findNodeForData(mdata), coll);
+      }
+    }
+  };
+  // end CustomDraggingTool class
+
+  // Show the diagram's model in JSON format
+
+  function loadFunctor(xml,linkDataArray){
+      var i,j,k,l;
+      var xmlDoc=xml.responseXML;
+      var type=["design","abstract of implementation"];
+      var fts = xmlDoc.getElementsByTagName("functor");
+      for (i = 0; i <2; i++) {
+          //alert(type[i]);
+      }
+
+      for (i = 0; i <fts.length; i++)
+      {
+            var ft=fts[i];
+            //alert(ft.getAttribute("exist"));
+            for(j=0;j<ft.childNodes.length;j++)
+            {
+                var entry=ft.childNodes[j];
+                var keyfrom,keyto;
+                //alert("entry from: "+entry.getAttribute("from")+"---"+"entry to: "+entry.getAttribute("to"));
+                for(k=0;k<keyObj.length;k++)
+                {
+                     if(entry.getAttribute("from")===keyObj[k].obj&&type[0]===keyObj[k].category)
+                     {
+                        //alert("from: "+keyObj[k].key);
+                        keyfrom=keyObj[k].key;
+                     }
+                }
+                for(l=0;l<keyObj.length;l++)
+                {
+                     if(entry.getAttribute("from")===keyObj[l].obj&&type[1]===keyObj[l].category)
+                     {
+                        //alert("to: "+keyObj[l].key);
+                        keyto=keyObj[l].key;
+                     }
+                }
+                linkDataArray.push({ "from":  keyfrom, "to": keyto });
+            }
+      }
+  }
+
+  function loadCategoryProcess(xml,nodeDataArray,linkDataArray){
+        var i,cat;
+        var xmlDoc = xml.responseXML;
+        var ccps = xmlDoc.getElementsByTagName("ConcreteCategoryProcess");
+        for (i = 0; i <ccps.length; i++) {
+            //alert("length "+ccps.length);
+            var ccp=ccps[i];
+            //alert(ccp.getAttribute("name"));
+            //alert(ccp.getAttribute("type"));
+            var category={ key: catkey, text: ccp.getAttribute("type"), category: "Super"};
+            nodeDataArray.push(category);
+            catkey=catkey-1;
+            var cp=ccp.childNodes[0];
+            var obj=cp.childNodes[0];
+            var x,y;
+            x=150*(i+1);
+            y=350*(i+1);
+            //alert(x);
+            //alert(y);
+            var point=new Point(x,y);
+            loadObject(null,obj,nodeDataArray,linkDataArray,category,point);
+        }
+  }
+
+  function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
+  function loadObject(pre,obj,nodeDataArray,linkDataArray,category,point)
+  {
+
+
+        var keys=[];
+        keys.push(category.key);
+        //nodeDataArray.push({ key: key, loc:point, text: "gg", "supers":keys});
+
+        var object={ key: key, loc: point.x.toString()+" "+point.y.toString(), text: obj.getAttribute("name"), "supers": keys};
+        keyObj.push(new keyObjMap(key,obj.getAttribute("name"),category.text));
+
+        nodeDataArray.push(object);
+        var current=key;
+        if(pre!=null)
+        {
+             linkDataArray.push({ "from":  pre, "to": current });
+        }
+        key=key+1;
+        var j,k;
+        var x,y;
+        var pointlist=[];
+        var p=obj.childNodes[0];
+        var alphabet=p.childNodes[0].childNodes[0].nodeValue;
+        //alert("alphabet "+alphabet);
+        var failures=p.childNodes[1];
+        for(j=0;j<failures.childNodes.length;j++)
+        {
+            var failure=failures.childNodes[j];
+            var trace=failure.childNodes[0].childNodes[0].nodeValue;
+            //alert("trace "+trace);
+            var refursal=failure.childNodes[1].childNodes[0].nodeValue;
+            //alert("refursal "+refursal);
+        }
+        for(k=1;k<obj.childNodes.length;k++)
+        {
+            x=point.x+200*(k);
+            y=point.y+50*(k-1);
+            //alert(x);
+            //alert(y);
+            pointlist.push(new Point(x,y));
+            //alert("another length "+obj.childNodes.length);
+            var nextobj=obj.childNodes[k];
+            loadObject(current,nextobj,nodeDataArray,linkDataArray,category,pointlist[k-1]);
+        }
+  }
+
+
+  function loadProcess(xml){
+
+  var i,j;
+  var xmlDoc = xml.responseXML;
+  var cps = xmlDoc.getElementsByTagName("concreteprocess");
+  for (i = 0; i <cps.length; i++) {
+		var cp=cps[i];
+		alert(cp.getAttribute("name"));
+		alert(cp.getAttribute("type"));
+		var p=cp.childNodes[0];
+		var alphabet=p.childNodes[0].childNodes[0].nodeValue;
+		alert(alphabet);
+		var failures=p.childNodes[1];
+		for(j=0;j<failures.childNodes.length;j++)
+		{
+			var failure=failures.childNodes[j];
+			var trace=failure.childNodes[0].childNodes[0].nodeValue;
+			alert(trace);
+			var refursal=failure.childNodes[1].childNodes[0].nodeValue;
+			alert(refursal);
+		}
+	}
+  }
+
+  function load() {
+    //myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+
+    // make sure all data have up-to-date "members" collections
+    // this does not prevent any "cycles" of membership, which would result in undefined behavior
+    var arr = myDiagram.model.nodeDataArray;
+    for (var i = 0; i < arr.length; i++) {
+      var data = arr[i];
+      var supers = data.supers;
+      if (supers) {
+        for (var j = 0; j < supers.length; j++) {
+          var sdata = myDiagram.model.findNodeDataForKey(supers[j]);
+          if (sdata) {
+            // update _supers to be an Array of references to node data
+            if (!data._supers) {
+              data._supers = [sdata];
+            } else {
+              data._supers.push(sdata);
+            }
+            // update _members to be an Array of references to node data
+            if (!sdata._members) {
+              sdata._members = [data];
+            } else {
+              sdata._members.push(data);
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+  
+</script>
+</head>
+<body onload="init()">
+<div id="sample">
+  <div id="myDiagram" style="border: solid 1px black; width: 100%; height: 800px"></div>
+   
+
+</textarea></div>
+</body>
+</html>

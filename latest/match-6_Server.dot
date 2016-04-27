@@ -1,0 +1,24 @@
+digraph g
+{
+   graph [rankdir=LR];
+   edge [arrowsize=0.3,fontsize=10,fontname=Helvetica];
+   node [shape=plaintext,width=.3,height=.2,fontsize=10,fontname=Helvetica];
+   1->3 [label="#"];
+   3->4 [label="start'"];
+   3->5 [label="stop'"];
+   3->6 [label="#'"];
+   3->7 [label="even'"];
+   3->11 [label="odd'"];
+   4->3 [label="#"];
+   5->3 [label="#"];
+   6->2 [label="#"];
+   7->10 [label="#"];
+   8->3 [label="evenReply"];
+   9->8 [label="#"];
+   10->9 [label="#"];
+   11->13 [label="#"];
+   12->3 [label="oddReply"];
+   13->15 [label="#"];
+   14->12 [label="#"];
+   15->14 [label="#"];
+}

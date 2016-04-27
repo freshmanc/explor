@@ -1,0 +1,198 @@
+file "prelude"
+line LW390
+lbl LA1484
+rtn "kbdch"
+ext "C" "kbdch"
+end
+line LW391
+lbl LA1489
+rtn "scrch"
+ext "C" "scrch"
+end
+line LW393
+lbl LA1494
+rtn "kbdln"
+ext "C" "kbdln"
+end
+line LW394
+lbl LA1499
+rtn "scrln"
+ext "C" "scrln"
+end
+line LW402
+lbl LA1510
+rtn "open"
+ext "C" "open"
+end
+line LW403
+lbl LA1515
+rtn "close"
+ext "C" "close"
+end
+line LW404
+lbl LA1523
+rtn "state"
+ext "C" "state"
+end
+line LW405
+lbl LA1531
+rtn "eof"
+ext "C" "eof"
+end
+line LW406
+lbl LA1539
+rtn "read"
+ext "C" "read"
+end
+line LW407
+lbl LA1547
+rtn "write"
+ext "C" "write"
+end
+line LW414
+lbl LA1555
+rtn "abs"
+ext "C" "abs_real"
+end
+line LW415
+lbl LA1563
+rtn "abs"
+ext "C" "abs_word"
+end
+line LW416
+lbl LA1571
+rtn "sqrt"
+ext "C" "sqrt_real"
+end
+line LW417
+lbl LA1579
+rtn "exp"
+ext "C" "exp_real"
+end
+line LW418
+lbl LA1587
+rtn "log"
+ext "C" "log_real"
+end
+line LW419
+lbl LA1595
+rtn "sin"
+ext "C" "sin_real"
+end
+line LW420
+lbl LA1603
+rtn "cos"
+ext "C" "cos_real"
+end
+line LW421
+lbl LA1611
+rtn "tan"
+ext "C" "tan_real"
+end
+line LW422
+lbl LA1619
+rtn "atan"
+ext "C" "atan_real"
+end
+line LW423
+lbl LA1629
+rtn "atan2"
+ext "C" "atan2_real_real"
+end
+line LW432
+lbl LA1637
+rtn "rand"
+ext "C" "rand_word"
+end
+line LW437
+lbl LA1645
+rtn "rand"
+ext "C" "rand_real"
+end
+line LW442
+lbl LA1650
+rtn "rand"
+ext "C" "rand_unit"
+end
+line LW447
+lbl LA1655
+rtn "seed"
+ext "C" "rand_seed"
+end
+file "match-4-s2.tex"
+line LW12
+lbl LA1718
+prc "Server"
+chn UP1704 LW3 "p"
+  fld LW0 "requestA"
+  fld LW1 "infoA"
+  fld LW2 "resultA"
+blk
+edec
+line LW14
+rsig UP1704 LW0
+line LW14
+rsig UP1704 LW1
+line LW14
+rsig UP1704 LW2
+eblk
+end
+line LW17
+lbl LA1751
+prc "Client"
+chn UP1723 LW3 "e"
+  fld LW0 "requestA"
+  fld LW1 "infoA"
+  fld LW2 "resultA"
+blk
+var UW1726 "r"
+edec
+line LW19
+cpy UW1726 LW0
+lbl LA2025
+jge LA2028 UW1726 LW10000
+line LW21
+ssig UP1723 LW0
+line LW21
+ssig UP1723 LW1
+line LW21
+ssig UP1723 LW2
+line LW19
+add UW1726 UW1726 LW1
+ja LA2025
+lbl LA2028
+eblk
+end
+line LW26
+lbl LA1764
+cell "Main"
+blk
+edec
+blk
+crtp UP1756 LW3 "m"
+  fld LW0 "requestA"
+  fld LW1 "infoA"
+  fld LW2 "resultA"
+edec
+line LW29
+argb LW1 LW0
+put UP1756 LW0
+crtx LA1718 "Server" LW1
+arge
+line LW30
+argb LW1 LW0
+put UP1756 LW0
+crtx LA1751 "Client" LW1
+arge
+eblk
+eblk
+end
+line LW33
+entr
+blk
+edec
+argb LW0 LW0
+crtc LA1764 "Main" LW0
+arge
+eblk
+end

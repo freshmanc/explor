@@ -1,0 +1,31 @@
+A vending machine that provides free drinks
+\begin{code}
+Drinks = protocol { *( coke | pepsi | tea ); stop }
+
+VendingMachine = process p: +Drinks
+{
+	loop select
+	{
+		|| p.coke
+		|| p.pepsi
+		|| p.tea
+		|| p.stop; exit
+	}
+}
+
+Customer = process p: -Drinks
+{
+	p.pepsi;
+	p.coke;
+	p.stop
+}
+
+Main = cell
+{	
+	p: Channel Drinks
+	VendingMachine(p)
+	Customer(p)
+}
+
+Main()
+\end{code}

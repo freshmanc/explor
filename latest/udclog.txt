@@ -1,0 +1,18 @@
+Desi (2016 March 9 16:00:47).
+Compiling 'match-4-s3.tex'.
+--------------------------------------------------
+Amelioration report:
+Pass directives statements labels jumps
+  0        58        212     15    11
+ 24        44        186      8     9
+Moved: 3 markers.
+Deleted: 8 markers,  0 jumps,  0 targets,  11 instructions,  0 blocks,  7 labels.
+--------------------------------------------------
+Writing match-4-s3.dil.
+--------------------------------------------------
+Measurements:
+Nodes allocated:         5497
+Space used:            216128 bytes.
+24 <= node size <= 336 bytes, average 39 bytes.
+--------------------------------------------------
+Compiled with 3 warning(s).

@@ -1,0 +1,10 @@
+digraph g
+{
+   graph [rankdir=LR];
+   edge [arrowsize=0.3,fontsize=10,fontname=Helvetica];
+   node [shape=plaintext,width=.3,height=.2,fontsize=10,fontname=Helvetica];
+   1->1 [label="task1"];
+   1->1 [label="task2"];
+   1->1 [label="task3"];
+   1->2 [label="#"];
+}

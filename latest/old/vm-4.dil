@@ -1,0 +1,314 @@
+file "prelude"
+line LW390
+lbl LA1484
+rtn "kbdch"
+ext "C" "kbdch"
+end
+line LW391
+lbl LA1489
+rtn "scrch"
+ext "C" "scrch"
+end
+line LW393
+lbl LA1494
+rtn "kbdln"
+ext "C" "kbdln"
+end
+line LW394
+lbl LA1499
+rtn "scrln"
+ext "C" "scrln"
+end
+line LW402
+lbl LA1510
+rtn "open"
+ext "C" "open"
+end
+line LW403
+lbl LA1515
+rtn "close"
+ext "C" "close"
+end
+line LW404
+lbl LA1523
+rtn "state"
+ext "C" "state"
+end
+line LW405
+lbl LA1531
+rtn "eof"
+ext "C" "eof"
+end
+line LW406
+lbl LA1539
+rtn "read"
+ext "C" "read"
+end
+line LW407
+lbl LA1547
+rtn "write"
+ext "C" "write"
+end
+line LW414
+lbl LA1555
+rtn "abs"
+ext "C" "abs_real"
+end
+line LW415
+lbl LA1563
+rtn "abs"
+ext "C" "abs_word"
+end
+line LW416
+lbl LA1571
+rtn "sqrt"
+ext "C" "sqrt_real"
+end
+line LW417
+lbl LA1579
+rtn "exp"
+ext "C" "exp_real"
+end
+line LW418
+lbl LA1587
+rtn "log"
+ext "C" "log_real"
+end
+line LW419
+lbl LA1595
+rtn "sin"
+ext "C" "sin_real"
+end
+line LW420
+lbl LA1603
+rtn "cos"
+ext "C" "cos_real"
+end
+line LW421
+lbl LA1611
+rtn "tan"
+ext "C" "tan_real"
+end
+line LW422
+lbl LA1619
+rtn "atan"
+ext "C" "atan_real"
+end
+line LW423
+lbl LA1629
+rtn "atan2"
+ext "C" "atan2_real_real"
+end
+line LW432
+lbl LA1637
+rtn "rand"
+ext "C" "rand_word"
+end
+line LW437
+lbl LA1645
+rtn "rand"
+ext "C" "rand_real"
+end
+line LW442
+lbl LA1650
+rtn "rand"
+ext "C" "rand_unit"
+end
+line LW447
+lbl LA1655
+rtn "seed"
+ext "C" "rand_seed"
+end
+file "vm-4.tex"
+line LW5
+lbl LA1777
+prc "VendingMachine"
+chn UP1718 LW9 "p"
+  fld LW0 "coin"
+  fld LW1 "refund"
+  fld LW2 "coffee"
+  fld LW3 "tea"
+  fld LW4 "green"
+  fld LW5 "red"
+  fld LW6 "mocha"
+  fld LW7 "cappuccino"
+  fld LW8 "stop"
+blk
+tmp GW2108
+tmp GW2110
+tmp GW2112
+tmp GW2141
+tmp GW2143
+tmp GB2158
+tmp GB2170
+tmp GW2190
+tmp GW2192
+tmp GB2207
+tmp GB2219
+tmp GB2236
+tmp GW2256
+tmp GW2258
+tmp GB2273
+tmp GB2285
+edec
+cpy GW2108 LW0
+cpy GW2110 LW0
+cpy GW2112 LW0
+line LW8
+lbl LA2122
+rsig UP1718 LW0
+line LW9
+cpy GW2141 LW2
+cpy GW2143 GW2141
+lbl LA2136
+add GW2141 GW2141 LW1
+rem GW2141 GW2141 LW3
+jtb GW2141 LA2138 LA2139 LA2140
+line LW11
+lbl LA2138
+nrqy GB2158 UP1718 LW1
+jf LA2131 GB2158
+line LW11
+rsig UP1718 LW1
+ja LA2132
+lbl LA2139
+nrqy GB2170 UP1718 LW3
+jf LA2131 GB2170
+line LW12
+rsig UP1718 LW3
+line LW13
+cpy GW2190 LW1
+cpy GW2192 GW2190
+lbl LA2186
+add GW2190 GW2190 LW1
+rem GW2190 GW2190 LW2
+jtb GW2190 LA2188 LA2189
+line LW15
+lbl LA2188
+nrqy GB2207 UP1718 LW4
+jf LA2181 GB2207
+line LW15
+rsig UP1718 LW4
+ja LA2182
+lbl LA2189
+nrqy GB2219 UP1718 LW5
+jf LA2181 GB2219
+line LW16
+rsig UP1718 LW5
+ja LA2182
+lbl LA2181
+jne LA2186 GW2190 GW2192
+wait
+ja LA2186
+lbl LA2182
+cpy GW2110 GW2190
+ja LA2132
+lbl LA2140
+nrqy GB2236 UP1718 LW2
+jf LA2131 GB2236
+line LW18
+rsig UP1718 LW2
+line LW19
+cpy GW2256 LW1
+cpy GW2258 GW2256
+lbl LA2252
+add GW2256 GW2256 LW1
+rem GW2256 GW2256 LW2
+jtb GW2256 LA2254 LA2255
+line LW21
+lbl LA2254
+nrqy GB2273 UP1718 LW6
+jf LA2247 GB2273
+line LW21
+rsig UP1718 LW6
+ja LA2248
+lbl LA2255
+nrqy GB2285 UP1718 LW7
+jf LA2247 GB2285
+line LW22
+rsig UP1718 LW7
+ja LA2248
+lbl LA2247
+jne LA2252 GW2256 GW2258
+wait
+ja LA2252
+lbl LA2248
+cpy GW2112 GW2256
+ja LA2132
+lbl LA2131
+jne LA2136 GW2141 GW2143
+wait
+ja LA2136
+lbl LA2132
+cpy GW2108 GW2141
+ja LA2122
+eblk
+end
+line LW29
+lbl LA1850
+prc "Customer"
+chn UP1782 LW9 "p"
+  fld LW0 "coin"
+  fld LW1 "refund"
+  fld LW2 "coffee"
+  fld LW3 "tea"
+  fld LW4 "green"
+  fld LW5 "red"
+  fld LW6 "mocha"
+  fld LW7 "cappuccino"
+  fld LW8 "stop"
+blk
+var UW1785 "i"
+edec
+line LW32
+cpy UW1785 LW0
+lbl LA2315
+jge LA2318 UW1785 LW5
+line LW34
+ssig UP1782 LW0
+line LW36
+ssig UP1782 LW1
+add UW1785 UW1785 LW1
+ja LA2315
+lbl LA2318
+eblk
+end
+line LW53
+lbl LA1863
+cell "Main"
+blk
+edec
+blk
+crtp UP1855 LW9 "p"
+  fld LW0 "coin"
+  fld LW1 "refund"
+  fld LW2 "coffee"
+  fld LW3 "tea"
+  fld LW4 "green"
+  fld LW5 "red"
+  fld LW6 "mocha"
+  fld LW7 "cappuccino"
+  fld LW8 "stop"
+edec
+line LW56
+argb LW1 LW0
+put UP1855 LW0
+crtx LA1777 "VendingMachine" LW1
+arge
+line LW57
+argb LW1 LW0
+put UP1855 LW0
+crtx LA1850 "Customer" LW1
+arge
+eblk
+eblk
+end
+line LW60
+entr
+blk
+edec
+argb LW0 LW0
+crtc LA1863 "Main" LW0
+arge
+eblk
+end
