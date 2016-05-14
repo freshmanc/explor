@@ -17,4 +17,6 @@ public class VM {
 			System.out.println("The implementation doesn't match the design");
 		}
 	}
+	public test main()
+	{}
 }
