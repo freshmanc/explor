@@ -140,34 +140,36 @@ public class TestServicesInThesis {
     	Utilities.printProcess(scenario3);
     	System.out.println();
     	
-    	
+    	//construct categories
 		CategoryProcess cscenario1=new CategoryProcess(scenario1);
 		CategoryProcess cscenario2=new CategoryProcess(scenario2);
 		CategoryProcess cscenario3=new CategoryProcess(scenario3);
 		CategoryProcess cdesign=new CategoryProcess(scenario3);
 	
-		
+		//construct functor for scenario 1
 		FunctorFailures cf1=new FunctorFailures();
 		boolean result1=cf1.compareCategories(cdesign, cscenario1);
 		System.out.println("scenario 1 matches design? "+result1);		
 		
+		//construct functor for scenario 2
 		FunctorFailures cf2=new FunctorFailures();
 		boolean result2=cf2.compareCategories(cdesign, cscenario2);
 		System.out.println("scenario 2 matches design? "+result2);	
 		
+		//construct functor for scenario 3
 		FunctorFailures cf3=new FunctorFailures();
 		boolean result3=cf3.compareCategories(cdesign, cscenario3);
 		System.out.println("scenario 3 matches design? "+result3);	
 		
-		
-		ConcreteCategoryProcess scenario=new ConcreteCategoryProcess(cscenario2,"scenario","implement");
+		//construct categories for graphical representation
+		ConcreteCategoryProcess scenario=new ConcreteCategoryProcess(cscenario1,"scenario","implementation");
 		ConcreteCategoryProcess design=new ConcreteCategoryProcess(cdesign,"original","design");
 		ConcreteCategoryProcesses cps=new ConcreteCategoryProcesses();
 		cps.add(scenario);
 		cps.add(design);
 		
 		
-		//ProcessCategoryXML pxml=new ProcessCategoryXML(cps);
-		ProcessCategoryXML pfxml=new ProcessCategoryXML(cps,cf2,result2);
+		//construct a functor for graphical representation
+		ProcessCategoryXML pfxml=new ProcessCategoryXML(cps,cf1,result1);
     }
 }
