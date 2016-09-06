@@ -118,8 +118,9 @@ public class ProcessCategoryXML {//create an xml file for a category of process
 			    {
 			    	Map.Entry<Trace, Trace> et=cfit.next();
 					Element entry = doc.createElement("entry");
+					//System.out.println("key"+et.getKey().toString()+" value"+et.getValue().toString());
 					entry.setAttribute("from", et.getKey().toString());
-					entry.setAttribute("to", et.getKey().toString());
+					entry.setAttribute("to", et.getValue().toString());
 					functor.appendChild(entry);
 			    }
 			}
@@ -155,7 +156,7 @@ public class ProcessCategoryXML {//create an xml file for a category of process
 			
 			TransitionSystem ts2=new TransitionSystem();
 			ts2.add(new Transition(0,"coin",1));
-			ts1.add(new Transition(1,"coke",2));
+			ts2.add(new Transition(1,"coke",2));
 			ts2.add(new Transition(1,"pepsi",3));
 			//ts2.add(new Transition(1,"tea",4));
 			//ts2.add(new Transition(4,"movie",5));
@@ -178,10 +179,11 @@ public class ProcessCategoryXML {//create an xml file for a category of process
 			cps.add(cp2);
 			
 			FunctorFailures cf=new FunctorFailures();
-			System.out.println(cf.compareCategories(cvmi2, cvmi1));
+			boolean result=cf.compareCategories(cvmi2, cvmi1);
+			System.out.println("implementation matches design? "+result);
 			
 			//ProcessCategoryXML pxml=new ProcessCategoryXML(cps);
-			ProcessCategoryXML pfxml=new ProcessCategoryXML(cps,cf,cf.compareCategories(cvmi2, cvmi1));
+			ProcessCategoryXML pfxml=new ProcessCategoryXML(cps,cf,result);
 			
 
 
